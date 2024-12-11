@@ -1,0 +1,16 @@
+P:\Programming\EngineeringThesis\EmployeeManagementSystem\ClientLibrary\bin\Debug\net8.0\ClientLibrary.deps.json
+P:\Programming\EngineeringThesis\EmployeeManagementSystem\ClientLibrary\bin\Debug\net8.0\ClientLibrary.dll
+P:\Programming\EngineeringThesis\EmployeeManagementSystem\ClientLibrary\bin\Debug\net8.0\ClientLibrary.pdb
+P:\Programming\EngineeringThesis\EmployeeManagementSystem\ClientLibrary\obj\Debug\net8.0\ClientLibrary.GeneratedMSBuildEditorConfig.editorconfig
+P:\Programming\EngineeringThesis\EmployeeManagementSystem\ClientLibrary\obj\Debug\net8.0\ClientLibrary.AssemblyInfoInputs.cache
+P:\Programming\EngineeringThesis\EmployeeManagementSystem\ClientLibrary\obj\Debug\net8.0\ClientLibrary.AssemblyInfo.cs
+P:\Programming\EngineeringThesis\EmployeeManagementSystem\ClientLibrary\obj\Debug\net8.0\ClientLibrary.csproj.CoreCompileInputs.cache
+P:\Programming\EngineeringThesis\EmployeeManagementSystem\ClientLibrary\obj\Debug\net8.0\ClientLibrary.sourcelink.json
+P:\Programming\EngineeringThesis\EmployeeManagementSystem\ClientLibrary\obj\Debug\net8.0\ClientLibrary.dll
+P:\Programming\EngineeringThesis\EmployeeManagementSystem\ClientLibrary\obj\Debug\net8.0\refint\ClientLibrary.dll
+P:\Programming\EngineeringThesis\EmployeeManagementSystem\ClientLibrary\obj\Debug\net8.0\ClientLibrary.pdb
+P:\Programming\EngineeringThesis\EmployeeManagementSystem\ClientLibrary\obj\Debug\net8.0\ref\ClientLibrary.dll
+P:\Programming\EngineeringThesis\EmployeeManagementSystem\ClientLibrary\bin\Debug\net8.0\BaseLibrary.dll
+P:\Programming\EngineeringThesis\EmployeeManagementSystem\ClientLibrary\bin\Debug\net8.0\BaseLibrary.pdb
+P:\Programming\EngineeringThesis\EmployeeManagementSystem\ClientLibrary\obj\Debug\net8.0\ClientLibrary.csproj.AssemblyReference.cache
+P:\Programming\EngineeringThesis\EmployeeManagementSystem\ClientLibrary\obj\Debug\net8.0\ClientLi.3D08BA28.Up2Date
