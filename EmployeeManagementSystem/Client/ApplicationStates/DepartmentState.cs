@@ -7,15 +7,13 @@
         public void GeneralDepartmentClicked()
         {
             ResetAllDepartments();
-
             ShowGeneralDepartment = true;
-
             GeneralDepartmentAction?.Invoke();
         }
 
         private void ResetAllDepartments()
         {
-            ShowGeneralDepartment = false;
+            ShowGeneralDepartment = false; 
         }
     }
 }
