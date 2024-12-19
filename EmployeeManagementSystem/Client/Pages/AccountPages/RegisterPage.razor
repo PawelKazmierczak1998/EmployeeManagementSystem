@@ -4,7 +4,7 @@
 @inject SfDialogService DialogService
 <div class="container">
     <div class="row">
-        <div class="col-lg-5"></div>
+        <div class="col-lg-4"></div>
         <div class="col-lg-4">
             <EditForm Enhance Model="User" OnValidSubmit="HandleRegistration">
                 <DataAnnotationsValidator />
@@ -65,6 +65,12 @@
     public bool ShowLoadingButton { get; set; } = false;
     Register User = new();
 
+    // [CascadingParameter] public Task<AuthenticationState> AuthenticationState { get; set; }
+    // protected async override Task OnInitializedAsync()
+    // {
+    //     await CheckUserAuthentication();
+    // }
+
     async Task HandleRegistration()
     {
         ShowLoadingButton = true;
@@ -86,4 +92,11 @@
        await DialogService.AlertAsync(content, title);
     }
 
+    // private async Task CheckUserAuthentication()
+    // {
+    //     var user = (await AuthenticationState).User;
+    //     bool isUserAuthenticated = user.Identity!.IsAuthenticated;
+    //     if (!isUserAuthenticated)
+    //         NavManager.NavigateTo("/identity/account/login");
+    // }
 }
