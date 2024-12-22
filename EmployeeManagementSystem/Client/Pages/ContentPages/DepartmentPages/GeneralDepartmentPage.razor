@@ -1,0 +1,242 @@
+﻿@implements IDisposable
+
+
+
+@if (allState.ShowGeneralDepartment)
+{
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="float-start">Generl Department</h4>
+                        <button class="btn btn-outline-success float-end" @onclick="AddOpenDialog"><i class="bi bi-plus-circle-doted"></i>Add Department</button>
+                    </div>
+                    <div class="card-header" style="max-height:580px; overflow-x:hidden; overflow-y:scroll;">
+                        <div class="card-body">
+                            <table class="table table-striped ">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Id</th>
+                                        <th scope="col">General Department</th>
+                                        <th scope="col">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (GeneralDepartments.Count <= 0)
+                                   {
+
+                                        <tr>
+                                            <td colspan="4"><div class="alert alert-info text-center">No General Department added yet!</div></td>
+                                        </tr>
+                                    }
+                                    else 
+                                    {
+
+
+                                        int count = 1;
+                                        foreach (var item in GeneralDepartments)
+                                        {
+                                            <tr>
+                                                <td>@count</td>
+                                                <td>@item.Id</td>
+                                                <td>@item.Name</td>
+                                                <td>
+                                                    <i class="bi bi-pencil text-info" @onclick="()=>EditClicked(item)"></i>
+                                                    <i class="bi bi-trash text-danger" @onclick="()=>DeleteClicked(item)"></i>
+                                                </td>
+                                            </tr>
+                                            count++;
+                                        }
+
+
+                                    }
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+}
+
+@code {
+    [CascadingParameter] public IModalService Modal { get; set; } = default!;
+    GeneralDepartmentDialog? generalDepartmentDialog;
+    GeneralDepartment GeneralDepartment = new();
+    public string Title { get; set; } = "Add";
+
+    public List<GeneralDepartment> GeneralDepartments { get; set; } = new();
+
+
+    protected async override void OnInitialized()
+    {
+        await GetGeneralDepartments();
+        allState.Action += StateHasChanged;
+    }
+
+    private async Task GetGeneralDepartments()
+    {
+        GeneralDepartments = await generalDepartmentService.GetAll(Constants.GeneralDepartmentBaseUrl);
+    }
+
+    async Task AddOpenDialog()
+    {
+        Title = "Add";
+        GeneralDepartment = new();
+        await OpenDialog();
+    }
+
+    async Task OpenDialog()
+    {
+        if (Title == "Update")
+        {
+            var parameters = new ModalParameters()
+          .Add(nameof(GeneralDepartmentDialog.GeneralDepartment), GeneralDepartment);
+
+
+            var form = Modal.Show<GeneralDepartmentDialog>($"{Title} Department", parameters);
+            var result = await form.Result;
+            if (result.Confirmed)
+            {
+                if (result.Data != null)
+                {
+                    var temp = result.Data.ToString().Split(';');
+                    var t1 = "";
+                    var t2 = 0;
+                    if (temp.Length == 2)
+                    {
+                        GeneralDepartment.Name = temp[1];
+
+                        t1 = temp[0];
+                        int.TryParse(t1, out t2);
+                        if (int.TryParse(t1, out t2))
+                        {
+                            GeneralDepartment.Id = t2;
+                            await HandleSaveOperationEvent(GeneralDepartment);
+
+                        }
+
+                    }
+                }
+
+            }
+        }
+        else
+        {
+            var form = Modal.Show<GeneralDepartmentDialog>($"{Title} Department");
+            var result = await form.Result;
+            if (result.Confirmed)
+            {
+                if (result.Data != null)
+                {
+                    var temp = result.Data.ToString().Split(';');
+                    var t1 = "";
+                    var t2 = 0;
+                    if (temp.Length == 2)
+                    {
+                        GeneralDepartment.Name = temp[1];
+
+                        t1 = temp[0];
+                        int.TryParse(t1, out t2);
+                        if (int.TryParse(t1, out t2))
+                        {
+
+                            await HandleSaveOperationEvent(GeneralDepartment);
+                            
+                        }
+                        
+                    }
+                   
+                }
+
+            }
+        }
+
+
+        
+
+
+
+    }
+
+    private async Task HandleSaveOperationEvent(GeneralDepartment generalDepartment)
+    {
+        bool successCheck = false;
+        if (generalDepartment.Id > 0)
+        {
+            var result = await generalDepartmentService.Update(generalDepartment, Constants.GeneralDepartmentBaseUrl);
+            successCheck = await DisplayMassage(result.Flag, result.Massage);
+
+        }
+        else
+        {
+            var response = await generalDepartmentService
+            .Insert(GeneralDepartment, Constants.GeneralDepartmentBaseUrl);
+            successCheck = await DisplayMassage(response.Flag, response.Massage);
+
+        }
+        if (successCheck)
+        {
+            GeneralDepartment = new();
+            await GetGeneralDepartments();
+            Title = "Add";
+            StateHasChanged();
+        }
+    }
+    private async void EditClicked(GeneralDepartment dep)
+    {
+        //await DisplayMassage(true,$"Editing department: {dep.Id}, {dep.Name}");
+        Title = "Update";
+        GeneralDepartment = dep;
+        await GetGeneralDepartments(); // Odświeżenie listy
+
+        await OpenDialog();
+
+       
+    }
+
+    private async void DeleteClicked(GeneralDepartment dep)
+    {
+        var confirmModal = Modal.Show<ConfirmationDialog>($"Are you sure you wanna delete {dep.Name}?");
+        var result = await confirmModal.Result;
+
+        if (result.Cancelled) return;
+
+        var response = await generalDepartmentService.DeleteById(dep.Id, Constants.GeneralDepartmentBaseUrl);
+        if (await DisplayMassage(response.Flag, response.Massage))
+        {
+            await GetGeneralDepartments();
+            StateHasChanged();
+        }
+    }
+
+
+    private async Task<bool> DisplayMassage(bool flag, string massage)
+    {
+
+        if (flag)
+        {
+            var parameters = new ModalParameters()
+        .Add(nameof(DisplayMessage.Message), massage);
+            Modal.Show<DisplayMessage>("Succes", parameters);
+            return true;
+        }
+        else
+        {
+            var parameters = new ModalParameters()
+        .Add(nameof(DisplayMessage.Message), massage);
+            Modal.Show<DisplayMessage>("Alert", parameters);
+            return false;
+        }
+    }
+    public void Dispose()
+    {
+        allState.Action -= StateHasChanged;
+    }
+}

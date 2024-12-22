@@ -1,0 +1,104 @@
+﻿@using BaseLibrary.Entities
+@using System.ComponentModel.DataAnnotations
+
+
+<div class="card border-success">
+    <EditForm Model="Branch" OnValidSubmit="Save">
+        <div class="card-body">
+            <div class="form-group">
+                <label for="form-label">Id:</label>
+                <input @bind="Branch.Id" class="form-control" disabled />
+                <ValidationMessage For="@(() => Branch.Id)" />
+            </div>
+            <div class="form-group">
+                <label for="form-label">Name:</label>
+                <InputText @bind-Value="Branch.Name" class="form-control" />
+                <ValidationMessage For="@(() => Branch.Name)" />
+            </div>
+            <div class="form-group mt-3 mb-3">
+                <label for="form-label">Select Department:</label>
+                @if (Branch.Department != null)
+                {
+                    string slected = Branch.Department!.Name;
+                    <select id="Departments" @onchange="OnValueChange">
+                        <option value="0">@slected</option>
+                        @foreach (var item in Departments)
+                        {
+                            <option value="@item.Id">@item.Name</option>
+                        }
+                    </select>
+                }
+                else
+                {
+                    <select id="Departments" @onchange="OnValueChange">
+                        <option value="0">-- Select a Department --</option>
+                        @foreach (var item in Departments)
+                        {
+                            <option value="@item.Id">@item.Name</option>
+                        }
+                    </select>
+                }
+
+            </div>
+        </div>
+        <div class="card-footer text-center">
+            <div class="mx-auto">
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <button @onclick="Cancel" class="btn btn-secondary">Cancel</button>
+            </div>
+
+        </div>
+
+        <DataAnnotationsValidator />
+    </EditForm>
+</div>
+
+@code {
+
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+
+    [Parameter] public Branch Branch { get; set; } = new();
+
+    [Parameter] public List<Department> Departments { get; set; } = new();
+
+    [Parameter] public EventCallback<Branch> HandleSaveOperationEvent { get; set; }
+
+
+    [Parameter] public string Title { get; set; } = "Add";
+    protected override async void OnInitialized()
+    {
+        Departments = await departmentService.GetAll(Constants.DepartmentBaseUrl);
+        StateHasChanged();
+    }
+
+
+    async Task Save()
+    {
+        var returnData = $"{Branch.Name};{Branch.DepartmentId.ToString()}";
+
+        if (string.IsNullOrEmpty(Branch.Name) || Branch.DepartmentId <= 0)
+        {
+
+        }
+        else
+        {
+
+            await BlazoredModal.CloseAsync(ModalResult.Ok(returnData));
+            await HandleSaveOperationEvent.InvokeAsync(Branch);
+        }
+
+    }
+
+    public void OnValueChange(ChangeEventArgs args)
+    {
+        if (int.TryParse(args.Value?.ToString(), out int departmentId))
+        {
+            Branch.DepartmentId = departmentId;
+        }
+    }
+
+    async Task Cancel() => await BlazoredModal.CancelAsync();
+
+
+}
+

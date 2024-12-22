@@ -1,0 +1,241 @@
+﻿@implements IDisposable
+
+
+
+@if (allState.ShowTown)
+{
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="float-start">Town</h4>
+                        <button class="btn btn-outline-success float-end" @onclick="AddOpenDialog"><i class="bi bi-plus-circle-doted"></i>Add Department</button>
+                    </div>
+                    <div class="card-header" style="max-height:580px; overflow-x:hidden; overflow-y:scroll;">
+                        <div class="card-body">
+                            <table class="table table-striped table-sm">
+                                <thead>
+                                    <tr>
+                                        <th scope="col"> #</th>
+                                        <th scope="col">Id</th>
+                                        <th scope="col">City</th>
+                                        <th scope="col">Town</th>
+                                        <th scope="col">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Towns.Count <=0)
+                                    {
+                                        <tr>
+
+                                            <td colspan="5"><div class="alert alert-info text-center">No Town added yet!</div></td>
+
+                                        </tr>
+                                    }
+                                    else
+                                    {
+
+                                        int count = 1;
+                                        foreach (var item in Towns)
+                                        {
+                                            <tr>
+                                                <td>@count</td>
+                                                <td>@item.Id</td>
+                                                <td>@item.City!.Name</td>
+                                                <td>@item.Name</td>
+                                                <td>
+                                                    <i class="bi bi-pencil text-info" @onclick="()=>EditClicked(item)"></i>
+                                                    <i class="bi bi-trash text-danger" @onclick="()=>DeleteClicked(item)"></i>
+                                                </td>
+                                            </tr>
+                                            count++;
+                                        }
+
+
+                                       
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [CascadingParameter] public IModalService Modal { get; set; } = default!;
+    Town Town = new();
+    TownDialog? TownDialog;
+    public string Title { get; set; } = "Add";
+
+    public List<Town> Towns { get; set; } = new();
+    public List<City> Cities { get; set; } = new();
+
+
+    protected async override void OnInitialized()
+    {
+        await GetCities();
+        await GetTowns();
+        allState.Action += StateHasChanged;
+    }
+
+    private async Task GetTowns()
+    {
+        Towns = await townService.GetAll(Constants.TownBaseUrl);
+    }
+    private async Task GetCities()
+    {
+        Cities = await cityService.GetAll(Constants.CityBaseUrl);
+    }
+
+    async Task AddOpenDialog()
+    {
+        Title = "Add";
+        Town = new();
+        await OpenDialog();
+    }
+
+    async Task OpenDialog()
+    {
+
+        if (Title == "Update")
+        {
+            var parameters = new ModalParameters()
+        .Add(nameof(TownDialog.Town), Town);
+
+
+            var form = Modal.Show<TownDialog>($"{Title} Town", parameters);
+            var result = await form.Result;
+
+            if (result.Confirmed)
+            {
+                var temp = result.Data.ToString().Split(';');
+                var t1 = "";
+                var t2 = 0;
+
+                if (temp.Length == 2)
+                {
+                    Town.Name = temp[0];
+                    t1 = temp[1];
+                    int.TryParse(t1, out t2);
+                    if (int.TryParse(t1, out t2))
+                    {
+                        Town.CityId = t2;
+
+
+                        await HandleSaveOperationEvent(Town);
+
+                    }
+
+                }
+
+            }
+        }
+        else
+        {
+            var form = Modal.Show<TownDialog>($"{Title} Town");
+            var result = await form.Result;
+
+            if (result.Confirmed)
+            {
+                var temp = result.Data.ToString().Split(';');
+                var t1 = "";
+                var t2 = 0;
+
+                if (temp.Length == 2)
+                {
+                    Town.Name = temp[0];
+                    t1 = temp[1];
+                    int.TryParse(t1, out t2);
+                    if (int.TryParse(t1, out t2))
+                    {
+                        Town.CityId = t2;
+
+
+                        await HandleSaveOperationEvent(Town);
+
+                    }
+
+                }
+
+            }
+        }
+    }
+
+    private async Task HandleSaveOperationEvent(Town town)
+    {
+        bool successCheck = false;
+        if (town.Id > 0)
+        {
+            var result = await townService
+            .Update(town, Constants.TownBaseUrl);
+            successCheck = await DisplayMassage(result.Flag, result.Massage);
+
+        }
+        else
+        {
+            var response = await townService
+            .Insert(town, Constants.TownBaseUrl);
+            successCheck = await DisplayMassage(response.Flag, response.Massage);
+
+        }
+        if (successCheck)
+        {
+            Town = new();
+            await GetTowns();
+            Title = "Add";
+            StateHasChanged();
+        }
+    }
+    private async void EditClicked(Town town)
+    {
+        Title = "Update";
+        Town = town;
+        await GetTowns();
+        await OpenDialog();
+
+    }
+
+    private async void DeleteClicked(Town town)
+    {
+        var confirmModal = Modal.Show<ConfirmationDialog>($"Are you sure you wanna delete {town.Name}?");
+        var result = await confirmModal.Result;
+
+        if (result.Cancelled) return;
+
+        var response = await townService.DeleteById(town.Id, Constants.TownBaseUrl);
+        if (await DisplayMassage(response.Flag, response.Massage))
+        {
+            await GetCities();
+            StateHasChanged();
+        }
+    }
+
+
+    private async Task<bool> DisplayMassage(bool flag, string massage)
+    {
+
+        if (flag)
+        {
+            var parameters = new ModalParameters()
+        .Add(nameof(DisplayMessage.Message), massage);
+            Modal.Show<DisplayMessage>("Succes", parameters);
+            return true;
+        }
+        else
+        {
+            var parameters = new ModalParameters()
+        .Add(nameof(DisplayMessage.Message), massage);
+            Modal.Show<DisplayMessage>("Alert", parameters);
+            return false;
+        }
+    }
+    public void Dispose()
+    {
+        allState.Action -= StateHasChanged;
+    }
+}

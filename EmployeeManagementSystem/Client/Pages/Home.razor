@@ -2,6 +2,7 @@
 
 @code {
     [CascadingParameter] public Task<AuthenticationState> AuthenticationState { get; set; }
+    [CascadingParameter] public IModalService Modal { get; set; } = default!;
 
     protected async override Task OnInitializedAsync()
     {

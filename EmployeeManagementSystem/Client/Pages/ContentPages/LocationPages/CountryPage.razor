@@ -1,0 +1,236 @@
+﻿@implements IDisposable
+
+
+
+@if (allState.ShowCountry)
+{
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="float-start">Country</h4>
+                        <button class="btn btn-outline-success float-end" @onclick="AddOpenDialog"><i class="bi bi-plus-circle-doted"></i>Add Department</button>
+                    </div>
+                    <div class="card-header" style="max-height:580px; overflow-x:hidden; overflow-y:scroll;">
+                        <div class="card-body">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Id</th>
+                                        <th scope="col">Country</th>
+                                        <th scope="col">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Countries.Count <= 0)
+                                    {
+                                        <tr>
+                                            <td colspan="4"><div class="alert alert-info text-center">No Coutry added yet!</div></td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+
+                                        int count = 1;
+                                        foreach (var item in Countries)
+                                        {
+                                            <tr>
+                                                <th>@count</th>
+                                                <td>@item.Id</td>
+                                                <td>@item.Name</td>
+                                                <td>
+                                                    <i class="bi bi-pencil text-info" @onclick="()=>EditClicked(item)"></i>
+                                                    <i class="bi bi-trash text-danger" @onclick="()=>DeleteClicked(item)"></i>
+                                                </td>
+                                            </tr>
+                                            count++;
+                                        }
+
+
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+}
+
+@code {
+    [CascadingParameter] public IModalService Modal { get; set; } = default!;
+    CountryDialog? country;
+    Country Country = new();
+    public string Title { get; set; } = "Add";
+
+    public List<Country> Countries { get; set; } = new();
+
+
+    protected async override void OnInitialized()
+    {
+        await GetCountries();
+        allState.Action += StateHasChanged;
+    }
+
+    private async Task GetCountries()
+    {
+        Countries = await countryService.GetAll(Constants.CountryBaseUrl);
+    }
+
+    async Task AddOpenDialog()
+    {
+        Title = "Add";
+        Country = new();
+        await OpenDialog();
+    }
+
+    async Task OpenDialog()
+    {
+        if (Title == "Update")
+        {
+            var parameters = new ModalParameters()
+          .Add(nameof(CountryDialog.Country), Country);
+
+
+            var form = Modal.Show<CountryDialog>($"{Title} Coutry", parameters);
+            var result = await form.Result;
+            if (result.Confirmed)
+            {
+                if (result.Data != null)
+                {
+                    var temp = result.Data.ToString().Split(';');
+                    var t1 = "";
+                    var t2 = 0;
+                    if (temp.Length == 2)
+                    {
+                        Country.Name = temp[1];
+
+                        t1 = temp[0];
+                        int.TryParse(t1, out t2);
+                        if (int.TryParse(t1, out t2))
+                        {
+                            Country.Id = t2;
+                            await HandleSaveOperationEvent(Country);
+                        }
+
+                    }
+                }
+
+            }
+        }
+        else
+        {
+            var form = Modal.Show<CountryDialog>($"{Title} Coutry");
+            var result = await form.Result;
+            if (result.Confirmed)
+            {
+                if (result.Data != null)
+                {
+                    var temp = result.Data.ToString().Split(';');
+                    var t1 = "";
+                    var t2 = 0;
+                    if (temp.Length == 2)
+                    {
+                        Country.Name = temp[1];
+
+                        t1 = temp[0];
+                        int.TryParse(t1, out t2);
+                        if (int.TryParse(t1, out t2))
+                        {
+
+                            await HandleSaveOperationEvent(Country);
+                        }
+
+                    }
+
+                }
+
+            }
+        }
+
+
+
+
+
+
+    }
+
+    private async Task HandleSaveOperationEvent(Country country)
+    {
+        bool successCheck = false;
+        if (country.Id > 0)
+        {
+            var result = await countryService.Update(country, Constants.CountryBaseUrl);
+            successCheck = await DisplayMassage(result.Flag, result.Massage);
+
+        }
+        else
+        {
+            var response = await countryService
+            .Insert(country, Constants.CountryBaseUrl);
+            successCheck = await DisplayMassage(response.Flag, response.Massage);
+
+        }
+        if (successCheck)
+        {
+            Country = new();
+            await GetCountries();
+            Title = "Add";
+            StateHasChanged();
+        }
+    }
+    private async void EditClicked(Country can)
+    {
+        Title = "Update";
+        Country = can;
+        await GetCountries(); // Odświeżenie listy
+
+        await OpenDialog();
+
+
+    }
+
+    private async void DeleteClicked(Country can)
+    {
+        var confirmModal = Modal.Show<ConfirmationDialog>($"Are you sure you wanna delete {can.Name}?");
+        var result = await confirmModal.Result;
+
+        if (result.Cancelled) return;
+
+        var response = await countryService.DeleteById(can.Id, Constants.CountryBaseUrl);
+        if (await DisplayMassage(response.Flag, response.Massage))
+        {
+            await GetCountries();
+            StateHasChanged();
+        }
+    }
+
+
+    private async Task<bool> DisplayMassage(bool flag, string massage)
+    {
+
+        if (flag)
+        {
+            var parameters = new ModalParameters()
+        .Add(nameof(DisplayMessage.Message), massage);
+            Modal.Show<DisplayMessage>("Succes", parameters);
+            return true;
+        }
+        else
+        {
+            var parameters = new ModalParameters()
+        .Add(nameof(DisplayMessage.Message), massage);
+            Modal.Show<DisplayMessage>("Alert", parameters);
+            return false;
+        }
+    }
+    public void Dispose()
+    {
+        allState.Action -= StateHasChanged;
+    }
+}

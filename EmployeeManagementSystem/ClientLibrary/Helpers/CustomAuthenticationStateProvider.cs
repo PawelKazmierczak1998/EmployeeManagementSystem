@@ -7,11 +7,11 @@ namespace ClientLibrary.Helpers
 {
     public class CustomAuthenticationStateProvider(LocalStorageService localStorageService) : AuthenticationStateProvider
     {
-        private readonly ClaimsPrincipal anonymous = new(new ClaimsIdentity());
+        private readonly ClaimsPrincipal anonymous = new( new ClaimsIdentity());
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
             var stringToken = await localStorageService.GetToken();
-            if (string.IsNullOrEmpty(stringToken)) return await Task.FromResult(new AuthenticationState(anonymous));
+            if (string.IsNullOrEmpty(stringToken)) return await Task.FromResult(new AuthenticationState(anonymous) );
 
             var deserializeToken = Serializations.DeserializeJsonString<UserSession>(stringToken);
             if (deserializeToken == null) return await Task.FromResult(new AuthenticationState(anonymous));

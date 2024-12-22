@@ -1,0 +1,60 @@
+﻿@using BaseLibrary.Entities
+@using System.ComponentModel.DataAnnotations
+
+
+<div class="card border-success">
+    <EditForm Model="Country" OnValidSubmit="Save">
+        <div class="card-body">
+            <div class="form-group">
+                <label for="message">Name:</label>
+                <InputText @bind-Value="Country.Name" class="form-control" placeholder="Enter a name" />
+                <ValidationMessage For="@(() => Country.Name)" />
+            </div>
+        </div>
+        <div class="card-footer text-center">
+            <div class="mx-auto">
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <button @onclick="Cancel" class="btn btn-secondary">Cancel</button>
+            </div>
+
+        </div>
+
+        <DataAnnotationsValidator />
+    </EditForm>
+</div>
+
+@code {
+
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+    [Parameter] public Country Country { get; set; } = new();
+    [Parameter] public string Title { get; set; } = "Add";
+    [Parameter] public EventCallback<Country> HandleSaveOperationEvent { get; set; }
+
+    protected override void OnInitialized()
+    {
+        StateHasChanged();
+    }
+
+
+    async Task Save()
+    {
+
+        var returnData = $"{Country.Id};{Country.Name}";
+        if (!string.IsNullOrWhiteSpace(Country.Name))
+        {
+            // Zakończenie modalu z wynikiem OK
+            await HandleSaveOperationEvent.InvokeAsync(Country);
+            await BlazoredModal.CloseAsync(ModalResult.Ok(returnData));
+        }
+        else
+        {
+            // Pokaż walidację
+            Console.WriteLine("Validation failed: Name is required.");
+        }
+    }
+
+    async Task Cancel() => await BlazoredModal.CancelAsync();
+
+
+}
+

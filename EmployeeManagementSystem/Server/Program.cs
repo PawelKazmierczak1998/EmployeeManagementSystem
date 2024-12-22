@@ -1,3 +1,4 @@
+using BaseLibrary.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -9,6 +10,9 @@ using System.Text;
 
 
 var builder = WebApplication.CreateBuilder(args);
+
+
+
 
 // Add services to the container.
 
@@ -41,16 +45,27 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = jwtSection!.Issuer,
         ValidAudience = jwtSection.Audience,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSection.Key!))
-        };
+    };
 });
 
 
 
 builder.Services.AddScoped<IUserAccount, UserAccountRepository>();
+
+builder.Services.AddScoped<IGenericRepository<GeneralDepartment>, GeneralDepartmentRepository>();
+builder.Services.AddScoped<IGenericRepository<Department>, DepartmentRepository>();
+builder.Services.AddScoped<IGenericRepository<Branch>, BranchRepository>();
+
+builder.Services.AddScoped<IGenericRepository<Country>, CountryRepository>();
+builder.Services.AddScoped<IGenericRepository<City>, CityRepository>();
+builder.Services.AddScoped<IGenericRepository<Town>, TowRepository>();
+
+builder.Services.AddScoped<IGenericRepository<Employee>, EmployeeRepository>();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowBlazorWasm",
-        builder=> builder.WithOrigins("http://localhost:5043", "https://localhost:7270")
+        builder => builder.WithOrigins("http://localhost:5043", "https://localhost:7270", "https://localhost:7169", "*")
         .AllowAnyMethod()
         .AllowAnyHeader()
         .AllowCredentials());
@@ -63,10 +78,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseCors("AllowBlazorWasm");
 app.UseHttpsRedirection();
 
-app.UseCors("AllowBlazorWasm");
+
 
 
 app.UseAuthentication();
