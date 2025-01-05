@@ -1,0 +1,369 @@
+﻿@implements IDisposable
+
+@if (allState.ShowEmployee)
+{
+    if (ShowAddOrUpdateEmployee)
+    {
+        <div class="container">
+            <div class="row mt-5">
+                <div class="col-lg-1 text-center">
+                    <i class="bi bi-x-lg fs-3 fw-bold text-danger" style="cursor:pointer" @onclick="Closeform"></i>
+                </div>
+                <div class="col-lg-6 text-center"><h2>Add Employee</h2></div>
+            </div>
+            <div class=" row">
+                <div class="col-lg-12 mt-2 d-flex justify-content-center">
+                    <div class="hstack">
+                        @if (FirstLayer)
+                        {
+                            <div class="@FloatingNumber1 text-center">1</div>
+                            <div class="@Floatingdiv1"> </div>
+                            <div class="@FloatingNumber2 text-center">2</div>
+                            <div class="@Floatingdiv2"> </div>
+                        }
+                        @if (SecondLayer)
+                        {
+                            <div class="@FloatingNumber1 text-center">1</div>
+                            <div class="@Floatingdiv1"> </div>
+                            <div class="@FloatingNumber2 text-center">2</div>
+                            <div class="@Floatingdiv2"> </div>
+                        }
+
+                    </div>
+                </div>
+                @*  //Employee Form /Firs /second layers *@
+                <div class="col-lg-12">
+                    <div class="container-fluid">
+                        @if (FirstLayer)
+                        {
+                            <EditForm Enhance Model="EmployeeGroup1" OnSubmit="From1">
+                                <DataAnnotationsValidator />
+                                <div class="row">
+                                    <div class="col-lg-2"></div>
+                                    <div class="col-lg-4">
+                                        <div class="card-title mb-5 fw-bold" style="font-family:Tahoma"> Personal Information</div>
+                                        <div class="card-body">
+                                            <div class="form-group">
+                                                <label class="form-label">Full Name</label>
+                                                <InputText @bind-Value="EmployeeGroup1.Name" class="from-controle" />
+                                                <ValidationMessage For="()=>EmployeeGroup1.Name" class="text-danger" />
+                                            </div>
+                                            <div class="form-group mt-2">
+                                                <label class="form-label">Telephone</label>
+                                                <InputText @bind-Value="EmployeeGroup1.TelephoneNumber" class="from-controle" />
+                                                <ValidationMessage For="()=>EmployeeGroup1.TelephoneNumber" class="text-danger" />
+                                            </div>
+                                            <div class="form-group mt-2">
+                                                <label class="form-label">Address</label>
+                                                <InputText @bind-Value="EmployeeGroup1.Address" class="from-controle" />
+                                                <ValidationMessage For="()=>EmployeeGroup1.Address" class="text-danger" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-4 mt-2">
+                                        <div class="card-title mb-5 fw-bold" style="font-family:Tahoma"> Other Infromation</div>
+                                        <div class="card-body">
+                                            <div class="form-group">
+                                                <label class="form-label">Civil Id</label>
+                                                <InputText @bind-Value="EmployeeGroup1.CivilId" class="from-controle" />
+                                                <ValidationMessage For="()=>EmployeeGroup1.CivilId" class="text-danger" />
+                                            </div>
+                                            <div class="form-group mt-2">
+                                                <label class="form-label">File Number</label>
+                                                <InputText @bind-Value="EmployeeGroup1.FileNumber" class="from-controle" />
+                                                <ValidationMessage For="()=>EmployeeGroup1.FileNumber" class="text-danger" />
+                                            </div>
+                                            <div class="form-group mt-2">
+                                                <label class="form-label">Photo</label>
+                                                <InputText @bind-Value="EmployeeGroup1.Photo" class="from-controle" />
+                                                <ValidationMessage For="()=>EmployeeGroup1.Photo" class="text-danger" />
+                                            </div>
+                                            <div class="form-group mt-2">
+                                                <button class="btn btn-primary float-end mt-4 mb-5" type="submit">
+                                                    <i class="bi bi-arrow-right"></i>
+                                                    Next
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2 mt-2"></div>
+                                </div>
+                            </EditForm>
+                        }
+                        @if (SecondLayer)
+                        {
+                            <EditForm Enhance Model="EmployeeGroup2" OnSubmit="From2">
+                                <DataAnnotationsValidator />
+                                <div class="row">
+                                    <div class="col-lg-2"></div>
+                                    <div class="col-lg-4">
+                                        <div class="card-title mb-5 fw-bold" style="font-family:Tahoma"> Job Information </div>
+                                        <div class="card-body">
+                                            <div class="form-group">
+                                                <label class="form-label">Job Name</label>
+                                                <InputText @bind-Value="EmployeeGroup2.JobName" class="from-controle" />
+                                                <ValidationMessage For="()=>EmployeeGroup2.JobName" class="text-danger" />
+                                            </div>
+                                            <div class="form-group mt-3">
+                                                <label class="form-label"></label>
+                                                <label class="form-label">@(GeneralDepartmentName == "" ? "Select General Department" : $"Selected General Department: {GeneralDepartmentName}")</label>
+                                                @if (GeneralDepartmentName != null)
+                                                {
+                                                    string slected = Employee.Branch!.Department!.GeneralDepartment!.Name!;
+                                                    <select id="GeneralDepartmentents" @onchange="OnValueChangeGeneralDepartmentents">
+                                                        <option value="0">@slected</option>
+                                                        @foreach (var item in GeneralDepartmentents)
+                                                        {
+                                                            <option value="@item.Id">@item.Name</option>
+                                                        }
+                                                    </select>
+                                                }
+                                                else
+                                                {
+                                                    <select id="GeneralDepartmentents" @onchange="OnValueChangeGeneralDepartmentents">
+                                                        <option value="0">-- Select a Department --</option>
+                                                        @foreach (var item in GeneralDepartmentents)
+                                                        {
+                                                            <option value="@item.Id">@item.Name</option>
+                                                        }
+                                                    </select>
+                                                }
+
+
+                                            </div>
+                                            <div class="form-group mt-3">
+                                                <label class="form-label">@(DepartmentName == "" ? "Select  Department" : $"Selected  Department: {DepartmentName}")</label>
+                                                @if (DepartmentName != null)
+                                                {
+                                                    string slected = Employee.Branch!.Department!.Name!;
+                                                    <select id="Departmentents" @onchange="OnValueChangeDepartmentents">
+                                                        <option value="0">@slected</option>
+                                                        @foreach (var item in Departmentents)
+                                                        {
+                                                            <option value="@item.Id">@item.Name</option>
+                                                        }
+                                                    </select>
+                                                }
+                                                else
+                                                {
+                                                    <select id="Departmentents" @onchange="OnValueChangeDepartmentents">
+                                                        <option value="0">-- Select a Department --</option>
+                                                        @foreach (var item in Departmentents)
+                                                        {
+                                                            <option value="@item.Id">@item.Name</option>
+                                                        }
+                                                    </select>
+                                                }
+                                            </div>
+                                            <div class="form-group mt-3">
+
+                                                <label class="form-label">@(BranchName == "" ? "Select  Branch" : $"Selected  Branch: {BranchName}")</label>
+                                                @if (DepartmentName != null)
+                                                {
+                                                    string slected = Employee.Branch!.Name!;
+                                                    <select id="Branches" @onchange="OnValueChangeBranches">
+                                                        <option value="0">@slected</option>
+                                                        @foreach (var item in Branches)
+                                                        {
+                                                            <option value="@item.Id">@item.Name</option>
+                                                        }
+                                                    </select>
+                                                }
+                                                else
+                                                {
+                                                    <select id="Branches" @onchange="OnValueChangeBranches">
+                                                        <option value="0">-- Select a Branch --</option>
+                                                        @foreach (var item in Branches)
+                                                        {
+                                                            <option value="@item.Id">@item.Name</option>
+                                                        }
+                                                    </select>
+                                                }
+                                                <ValidationMessage For="()=>EmployeeGroup2.BranchId" />
+                                            </div>
+                                            <div class="form-group mt-4 mb-5">
+                                                <button class="btn btn-primary float-start" type="button" @onclick="PrevClicked">
+                                                    <i class="bi bi-arrow-left"></i>
+                                                    Prev
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-4 mt-2">
+                                        <div class="card-title mb-5 fw-bold" style="font-family:Tahoma"> Location Information </div>
+                                        <div class="card-body">                                         
+                                            <div class="form-group mt-3">
+                                                <label class="form-label">@(CoutnryName == "" ? "Select Country " : $"Selected Country : {CoutnryName}")</label>
+                                                @if (CoutnryName != null)
+                                                {
+                                                    string slected = Employee.Town!.City!.Country!.Name!;
+                                                    <select id="Countries" @onchange="OnValueChangeCountries">
+                                                        <option value="0">@slected</option>
+                                                        @foreach (var item in Countries)
+                                                        {
+                                                            <option value="@item.Id">@item.Name</option>
+                                                        }
+                                                    </select>
+                                                }
+                                                else
+                                                {
+                                                    <select id="Countries" @onchange="OnValueChangeCountries">
+                                                        <option value="0">-- Select a Country --</option>
+                                                        @foreach (var item in Countries)
+                                                        {
+                                                            <option value="@item.Id">@item.Name</option>
+                                                        }
+                                                    </select>
+                                                }
+
+
+                                            </div>
+                                            <div class="form-group mt-3">
+                                                <label class="form-label">@(CityName == "" ? "Select  City" : $"Selected  City: {CityName}")</label>
+                                                @if (CityName != null)
+                                                {
+                                                    string slected = Employee.Town!.Cit!.Name!;
+                                                    <select id="Cities" @onchange="OnValueChangeCities">
+                                                        <option value="0">@slected</option>
+                                                        @foreach (var item in Cities)
+                                                        {
+                                                            <option value="@item.Id">@item.Name</option>
+                                                        }
+                                                    </select>
+                                                }
+                                                else
+                                                {
+                                                    <select id="Cities" @onchange="OnValueChangeCities">
+                                                        <option value="0">-- Select a City --</option>
+                                                        @foreach (var item in Cities)
+                                                        {
+                                                            <option value="@item.Id">@item.Name</option>
+                                                        }
+                                                    </select>
+                                                }
+                                            </div>
+                                            <div class="form-group mt-3">
+
+                                                <label class="form-label">@(TownName == "" ? "Select  Town" : $"Selected  Town: {TownName}")</label>
+                                                @if (DepartmentName != null)
+                                                {
+                                                    string slected = Employee.Town!.Name!;
+                                                    <select id="Towns" @onchange="OnValueChangeTowns">
+                                                        <option value="0">@slected</option>
+                                                        @foreach (var item in Towns)
+                                                        {
+                                                            <option value="@item.Id">@item.Name</option>
+                                                        }
+                                                    </select>
+                                                }
+                                                else
+                                                {
+                                                    <select id="Towns" @onchange="OnValueChangeTowns">
+                                                        <option value="0">-- Select a Town --</option>
+                                                        @foreach (var item in Towns)
+                                                        {
+                                                            <option value="@item.Id">@item.Name</option>
+                                                        }
+                                                    </select>
+                                                }
+                                                <ValidationMessage For="()=>EmployeeGroup2.TownId"/>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="form-label">Other</label>
+                                                <InputText @bind-Value="EmployeeGroup2.other" class="from-controle" />
+                                                <ValidationMessage For="()=>EmployeeGroup2.other" class="text-danger" />
+                                            </div>
+                                            <div class="form-group mt-4 mb-5">
+                                                <button class="btn btn-primary float-start" type="submit" >
+                                                    <i class="bi bi-save"></i>
+                                                    Save
+                                                </button>
+                                            </div>
+                                        </div>
+                                    
+                                    </div>
+                                    <div class="col-lg-2 mt-2"></div>
+                                </div>
+                            </EditForm>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+<style>
+    .floatingDiv {
+        width: 500px;
+        background: #228ada;
+        height: 10px;
+    }
+
+    .floatingNumber {
+        border-radius: 50%;
+        color: white;
+        background: #1d1858;
+        width: 20px;
+        height: 20px;
+    }
+
+    .inactive-div {
+        width: 500px;
+        background: gray;
+        height: 10px;
+    }
+
+    .inactive-span {
+        border-radius: 50%;
+        color: white;
+        background: gray;
+        width: 20px;
+        height: 20px;
+    }
+
+    .format-border {
+        border-radius: 20px;
+    }
+</style>
+@code {
+    [Parameter] public Employee Employee { get; set; } = new();
+
+    [Parameter] public bool ShowAddOrUpdateEmployee { get; set; }
+    [Parameter] public EmployeeGrouping1 EmployeeGroup1 { get; set; } = new();
+    [Parameter] public EmployeeGrouping2 EmployeeGroup2 { get; set; } = new();
+
+
+    [Parameter] public List<Country> Countries { get; set; } = new();
+    [Parameter] public List<City> Cities { get; set; } = new();
+    [Parameter] public List<Town> Towns { get; set; } = new();
+
+
+    [Parameter] public List<GeneralDepartment> GeneralDepartmentents { get; set; } = new();
+    [Parameter] public List<Department> Departmentents { get; set; } = new();
+    [Parameter] public List<Branch> Branches { get; set; } = new();
+
+    string FloatingNumber1 = "floatingNumber";
+    string Floatingdiv1 = "floatingDiv";
+    string FloatingNumber2 = "inactive-span";
+    string Floatingdiv2 = "inactive-span";
+
+    public bool FirstLayer { get; set; } = true;
+    public bool SecondLayer { get; set; } = false;
+
+
+    private void ShowLayer2()
+    {
+        FirstLayer = false;
+        SecondLayer = true;
+
+    }
+
+    void PrevClicked()
+    {
+        FirstLayer = true;
+        SecondLayer = false;
+    }
+
+}
