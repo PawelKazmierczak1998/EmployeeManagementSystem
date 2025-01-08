@@ -1,12 +1,21 @@
 ﻿@page "/home/dashboard"
-@using Client.Pages.AdministrationPages
+
+
 @layout MainLayout
 
 <TableBanner/>
-
+<UserPage/>
+<GeneralDepartmentPage/>
+<DepartmentPage/>
+<BranchPage/>
+<CountryPage/>
+<CityPage/>
+<TownPage/>
+<EmployeePage/>
 
 @code {
     [CascadingParameter] public Task<AuthenticationState> AuthenticationState { get; set; }
+
     protected async override Task OnInitializedAsync()
     {
         await CheckUserAuthentication();
