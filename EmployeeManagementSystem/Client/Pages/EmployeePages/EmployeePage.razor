@@ -1,1 +1,259 @@
-﻿
+﻿@implements IDisposable
+
+@if (allState.ShowEmployee)
+{
+    @if (ShowMainPage)
+    {
+        <div class="container-fluid mt-5">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <button class="btn btn-outline-success" @onclick="ShowAddOrUpdateEmployeeButtonClicked">
+                                <i class="bi bi-plus-circle-dotted"></i>Add Employee
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <QuickGrid Items="Employees.AsQueryable()">
+                                <PropertyColumn Property="e=>e.Id" />
+                                <TemplateColumn Title="Photo">
+                                    @{
+                                        var employee = (context as Employee);
+                                        <div class="image">
+                                            <img src="@employee!.Photo" alt="@employee!.Name" width="150" height="150" />
+                                        </div>
+                                    }
+                                </TemplateColumn>
+                                <PropertyColumn Property="e=>e.CivilId" />
+                                <PropertyColumn Property="e=>e.FileNumber" />
+                                <PropertyColumn Property="e=>e.Name" />
+                                <PropertyColumn Property="e=>e.TelephoneNumber" />
+                                <PropertyColumn Property="e=>e.JobName" />
+                                <PropertyColumn Title="Branch" Property="e=>e.Branch!.Name" />
+                                <PropertyColumn Title="Town" Property="e=>e.Town!.Name" />
+                                <TemplateColumn Title="Action">
+                                    @{
+                                        var employee = (context as Employee);
+                                        <div>
+                                            <i class="bi bi-pencil text-info" @onclick="()=>EditClicked(employee)"></i>
+                                            <i class="bi bi-trash text-danger" @onclick="()=>DeleteClicked(employee)"></i>
+                                            <i class="bi bi-file-person text-danger" @onclick="()=>ViewClicked(employee)"></i>
+                                        </div>
+
+                                    }
+                                </TemplateColumn>
+
+                            </QuickGrid>
+                        </div>
+                        <div class="card-footer"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+}
+
+
+<style>
+    /* Stripe effect */
+    ::deep tbody tr {
+    background-color: rgba(0,0,0,0.04);
+    }
+
+    ::deep tbody tr:nth-child(even) {
+    background: rgba(255,255,255,0.4);
+    }
+</style>
+
+<AddOrUpdateEmployeePage @ref="addOrUpdateEmployee"
+Employee="Employee"
+ShowAddOrUpdateEmployee="ShowAddOrUpdatePage"
+NotifyPerentFormCloseClicked="NotifyPerentFormCloseClicked"
+Countries="DefaultCountries"
+Cities="DefaultCities"
+Towns="DefaultTowns"
+GeneralDepartmentents="DefaultGeneralDepartmentents"
+Departmentents="DefaultDepartmentents"
+Branches="DefaultBranches"
+HandleCountrySelectionEvent="HandleCountrySelectionEvent"
+HandleCitySelectionEvent="HandleCitySelectionEvent"
+HandleGeneralDepartmentSelectionEvent="HandleGeneralDepartmentSelectionEvent"
+HandleDepartmententSelectionEvent="HandleDepartmententSelectionEvent"
+HandleSaveEmployeeClickedEvent="HandleSaveEmployeeClickedEvent" />
+
+<EmployeeDetailPage @ref="employeeDetailPage" Employee="Employee" ShowDetailsPage=" ShowDetailsPage" HandleDetailsPageClosedClicked="HandleDetailsPageClosedClicked" />
+@code {
+    [CascadingParameter] public IModalService Modal { get; set; } = default!;
+    AddOrUpdateEmployeePage? addOrUpdateEmployee;
+    EmployeeDetailPage? employeeDetailPage;
+    public List<Employee> Employees { get; set; } = [];
+    public Employee Employee { get; set; } = new();
+    public string Title { get; set; } = "Add";
+    public List<Country> DefaultCountries { get; set; } = [];
+    public List<City> DefaultCities { get; set; } = [];
+    public List<Town> DefaultTowns { get; set; } = [];
+
+    public List<GeneralDepartment> DefaultGeneralDepartmentents { get; set; } = [];
+    public List<Department> DefaultDepartmentents { get; set; } = [];
+    public List<Branch> DefaultBranches { get; set; } = [];
+
+    public List<Department> SelectedDepartments { get; set; } = [];
+    public List<Branch> SelectedBranches { get; set; } = [];
+    public List<City> SelectedCities { get; set; } = [];
+    public List<Town> SelectedTowns { get; set; } = [];
+
+    protected async override Task OnInitializedAsync()
+    {
+        allState.Action += StateHasChanged;
+        await LoadEmployees();
+        await LoadDefaults();
+    }
+
+    // inforumje kiedy formularz został zamkniety
+    private async Task NotifyPerentFormCloseClicked()
+    {
+        ShowMainPage = true;
+        ShowAddOrUpdatePage = false;
+        await LoadDefaults();
+        await LoadEmployees();
+
+    }
+    private async Task LoadEmployees()
+    {
+        Employees = await employeeService.GetAll(Constants.EmployeeBaseUrl);
+    }
+
+    private async Task LoadDefaults()
+    {
+        DefaultCountries = await countryService.GetAll(Constants.CountryBaseUrl);
+        DefaultCities = await cityService.GetAll(Constants.CityBaseUrl);
+        DefaultTowns = await townService.GetAll(Constants.TownBaseUrl);
+        DefaultGeneralDepartmentents = await generalDepartmentService.GetAll(Constants.GeneralDepartmentBaseUrl);
+        DefaultDepartmentents = await departmentService.GetAll(Constants.DepartmentBaseUrl);
+        DefaultBranches = await branchService.GetAll(Constants.BranchBaseUrl);
+    }
+
+    private void HandleCountrySelectionEvent(int countryId) => SelectedCities = DefaultCities.Where(c => c.CountryId == countryId).ToList();
+    private void HandleCitySelectionEvent(int cityId) => SelectedTowns = DefaultTowns.Where(c => c.CityId == cityId).ToList();
+    private void HandleGeneralDepartmentSelectionEvent(int generalDepartmentId) => SelectedDepartments = DefaultDepartmentents.Where(c => c.GeneralDepartmentId == generalDepartmentId).ToList();
+    private void HandleDepartmententSelectionEvent(int departmentId) => SelectedBranches = DefaultBranches.Where(c => c.DepartmentId == departmentId).ToList();
+
+    async Task HandleSaveEmployeeClickedEvent(Employee employee)
+    {
+        bool successCheck = false;
+        if (employee.Id > 0)
+        {
+            var result = await employeeService.Update(employee, Constants.EmployeeBaseUrl);
+            successCheck = await DisplayMassage(result.Flag, result.Massage);
+            Title = "Add";
+        }
+        else
+        {
+            var response = await employeeService.Insert(employee, Constants.EmployeeBaseUrl);
+            successCheck = await DisplayMassage(response.Flag, response.Massage);
+            Title = "Add";
+        }
+        if (successCheck)
+            addOrUpdateEmployee!.ClearContent();
+    }
+
+
+
+    public bool ShowMainPage { get; set; } = true;
+    public bool ShowAddOrUpdatePage { get; set; } = false;
+    public bool ShowDetailsPage { get; set; } = false;
+    public void ShowAddOrUpdateEmployeeButtonClicked()
+    {
+        if (Title.Contains("Update"))
+        {
+            addOrUpdateEmployee!.Title = "Update";
+            Title = "Add";
+        }
+        else
+        {
+            Title = "Add";
+            addOrUpdateEmployee!.Title = "Add";
+        }
+
+        ShowMainPage = false;
+        ShowAddOrUpdatePage = true;
+    }
+
+    private async void EditClicked(Employee employee)
+    {
+        Title = "Update";
+        Employee = employee;
+        addOrUpdateEmployee.EmployeeGroup1.Name = employee.Name;
+        addOrUpdateEmployee.EmployeeGroup1.Address = employee.Address;
+        addOrUpdateEmployee.EmployeeGroup1.CivilId = employee.CivilId;
+        addOrUpdateEmployee.EmployeeGroup1.TelephoneNumber = employee.TelephoneNumber;
+        addOrUpdateEmployee.EmployeeGroup1.FlieNumber = employee.FileNumber;
+        addOrUpdateEmployee.EmployeeGroup1.Photo = employee.Photo;
+
+        addOrUpdateEmployee.EmployeeGroup2.JobName = employee.JobName;
+        addOrUpdateEmployee.EmployeeGroup2.TownId = employee.TownId;
+        addOrUpdateEmployee.EmployeeGroup2.BranchId = employee.BranchId;
+        addOrUpdateEmployee.EmployeeGroup2.other = employee.Other;
+
+
+        await LoadEmployees();
+        ShowAddOrUpdateEmployeeButtonClicked();
+    }
+
+    private async void DeleteClicked(Employee employee)
+    {
+        var confirmModal = Modal.Show<ConfirmationDialog>($"Are you sure you wanna delete {employee.Id}?");
+        var result = await confirmModal.Result;
+
+        if (result.Cancelled) return;
+
+        var response = await employeeService.DeleteById(employee.Id, Constants.EmployeeBaseUrl);
+        if (await DisplayMassage(response.Flag, response.Massage))
+        {
+            await LoadEmployees();
+            StateHasChanged();
+        }
+    }
+
+    private async void ViewClicked(Employee employee)
+    {
+        Employee = employee;
+        //employeeDetailPage.Employee = employee;
+        ShowDetailsPage = true;
+        ShowMainPage = false;
+    }
+
+    void HandleDetailsPageClosedClicked()
+    {
+        ShowDetailsPage = false;
+        ShowMainPage = true;
+    }
+
+    private async Task<bool>
+    DisplayMassage(bool flag, string massage)
+    {
+
+        if (flag)
+        {
+            var parameters = new ModalParameters()
+            .Add(nameof(DisplayMessage.Message), massage);
+            Modal.Show<DisplayMessage>
+                ("Succes", parameters);
+            return true;
+        }
+        else
+        {
+            var parameters = new ModalParameters()
+            .Add(nameof(DisplayMessage.Message), massage);
+            Modal.Show<DisplayMessage>
+                ("Alert", parameters);
+            return false;
+        }
+    }
+
+    public void Dispose() => allState.Action -= StateHasChanged;
+}
+
+
+
