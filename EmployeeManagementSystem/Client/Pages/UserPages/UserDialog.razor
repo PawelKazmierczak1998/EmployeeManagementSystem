@@ -1,0 +1,102 @@
+﻿@using BaseLibrary.Entities
+@using System.ComponentModel.DataAnnotations
+
+
+<div class="card border-success">
+    <EditForm Model="ManageUser" OnValidSubmit="Save">
+        <div class="card-body">
+            <div class="form-group">
+                <label for="form-label">Id:</label>
+                <input @bind="ManageUser.UserId" class="form-control" disabled />
+                <ValidationMessage For="@(() => ManageUser.UserId)" />
+            </div>
+            <div class="form-group">
+                <label for="form-label">Name:</label>
+                <InputText @bind-Value="ManageUser.Name" class="form-control" disabled />
+                <ValidationMessage For="@(() => ManageUser.Name)" />
+            </div>
+            <div class="form-group mt-3 mb-3">
+                <label for="form-label">Select Role:</label>
+                @if (ManageUser.Role != null)
+                {
+                    string slected = ManageUser!.Role!;
+
+                    <select id="Role" @onchange="OnValueChange">
+                        <option value="0">@slected</option>
+                        @foreach (var item in SystemRoles)
+                        {
+                            if (item.Name == slected)
+                            {
+
+                            }
+                            else{
+                                <option value="@item.Name">@item.Name</option>
+                            }
+                            
+                        }
+                    </select>  
+
+                    @*   <select id="SystemRoles">
+                        <option value="0">@slected</option>
+                        @foreach(var item in SystemRoles)
+                        {
+                            <option value="@item.Id">@item.Name</option>
+                        }
+                    </select> *@
+
+                }
+            </div>
+        </div>
+        <div class="card-footer text-center">
+            <div class="mx-auto">
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <button @onclick="Cancel" class="btn btn-secondary">Cancel</button>
+            </div>
+
+        </div>
+
+        <DataAnnotationsValidator />
+    </EditForm>
+</div>
+
+
+@code {
+
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+
+    [Parameter] public ManageUser ManageUser { get; set; } = new();
+
+    [Parameter] public List<SystemRole> SystemRoles { get; set; } = new();
+
+    [Parameter] public EventCallback<ManageUser> HandleSaveOperationEvent { get; set; }
+
+    protected override async void OnInitialized()
+    {
+        SystemRoles = await accountService.GetRoles();
+        StateHasChanged();
+    }
+
+    public string t { get; set; }
+
+    async Task Save()
+    {
+
+
+        var returnData = $"{t}";
+        await HandleSaveOperationEvent.InvokeAsync(ManageUser);
+        await BlazoredModal.CloseAsync(ModalResult.Ok(returnData));
+
+    }
+
+    public void OnValueChange(ChangeEventArgs args)
+    {
+        t = args.Value!.ToString()!;
+
+        
+    }
+
+    async Task Cancel() => await BlazoredModal.CancelAsync();
+
+
+}
+

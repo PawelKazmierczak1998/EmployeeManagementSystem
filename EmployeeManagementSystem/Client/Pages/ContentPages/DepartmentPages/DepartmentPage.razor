@@ -1,0 +1,236 @@
+﻿@implements IDisposable
+
+
+
+@if (allState.ShowDepartment)
+{
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="float-start">Department</h4>
+                        <button class="btn btn-outline-success float-end" @onclick="AddOpenDialog"><i class="bi bi-plus-circle-doted"></i>Add Department</button>
+                    </div>
+                    <div class="card-header" style="max-height:580px; overflow-x:hidden; overflow-y:scroll;">
+                        <div class="card-body">
+                            <table class="table table-striped ">
+                                <thead>
+                                    <tr>
+                                        <th scope="col"> #</th>
+                                        <th scope="col">Id</th>
+                                        <th scope="col">General Department</th>
+                                        <th scope="col">Department</th>
+                                        <th scope="col">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Departments.Count <= 0)
+                                    {
+                                        <tr>
+                                            <td colspan="5"><div class="alert alert-info text-center">No Department added yet!</div></td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                       
+                                        int count = 1;
+                                        foreach (var item in Departments)
+                                        {
+                                            <tr>
+                                                <th>@count</th>
+                                                <td>@item.Id</td>
+                                                <td>@item.GeneralDepartment!.Name</td>
+                                                <td>@item.Name</td>
+                                                <td>
+                                                    <i class="bi bi-pencil text-info" @onclick="()=>EditClicked(item)"></i>
+                                                    <i class="bi bi-trash text-danger" @onclick="()=>DeleteClicked(item)"></i>
+                                                </td>
+                                            </tr>
+                                            count++;
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [CascadingParameter] public IModalService Modal { get; set; } = default!;
+    Department Department = new();
+    DepartmentDialog? DepartmentDialog;
+    public string Title { get; set; } = "Add";
+
+    public List<GeneralDepartment> GeneralDepartments { get; set; } = new();
+    public List<Department> Departments { get; set; } = new();
+
+
+    protected async override void OnInitialized()
+    {
+        await GetDepartments();
+        await GetGeneralDepartments();
+        allState.Action += StateHasChanged;
+    }
+
+    private async Task GetGeneralDepartments()
+    {
+        GeneralDepartments = await generalDepartmentService.GetAll(Constants.GeneralDepartmentBaseUrl);
+    }
+    private async Task GetDepartments()
+    {
+        Departments = await departmentService.GetAll(Constants.DepartmentBaseUrl);
+    }
+
+    async Task AddOpenDialog()
+    {
+        Title = "Add";
+        Department = new();
+        await OpenDialog();
+    }
+
+    async Task OpenDialog()
+    {
+
+        if (Title == "Update")
+        {
+            var parameters = new ModalParameters()
+        .Add(nameof(DepartmentDialog.Department), Department);
+
+
+            var form = Modal.Show<DepartmentDialog>($"{Title} Department", parameters);
+            var result = await form.Result;
+
+            if (result.Confirmed)
+            {
+                var temp = result.Data.ToString().Split(';');
+                var t1 = "";
+                var t2 = 0;
+
+                if (temp.Length == 2)
+                {
+                    Department.Name = temp[0];
+                    t1 = temp[1];
+                    int.TryParse(t1, out t2);
+                    if (int.TryParse(t1, out t2))
+                    {
+                        Department.GeneralDepartmentId = t2;
+
+
+                        await HandleSaveOperationEvent(Department);
+
+                    }
+
+                }
+
+            }
+        }
+        else
+        {
+            var form = Modal.Show<DepartmentDialog>($"{Title} Department");
+            var result = await form.Result;
+
+            if (result.Confirmed)
+            {
+                var temp = result.Data.ToString().Split(';');
+                var t1 = "";
+                var t2 = 0;
+
+                if (temp.Length == 2)
+                {
+                    Department.Name = temp[0];
+                    t1 = temp[1];
+                    int.TryParse(t1, out t2);
+                    if (int.TryParse(t1, out t2))
+                    {
+                        Department.GeneralDepartmentId = t2;
+
+
+                        await HandleSaveOperationEvent(Department);
+
+                    }
+
+                }
+
+            }
+        }
+    }
+
+    private async Task HandleSaveOperationEvent(Department department)
+    {
+        bool successCheck = false;
+        if (department.Id > 0)
+        {
+            var result = await departmentService
+            .Update(department, Constants.DepartmentBaseUrl);
+            successCheck = await DisplayMassage(result.Flag, result.Massage);
+
+        }
+        else
+        {
+            var response = await departmentService
+            .Insert(department, Constants.DepartmentBaseUrl);
+            successCheck = await DisplayMassage(response.Flag, response.Massage);
+
+        }
+        if (successCheck)
+        {
+            Department = new();
+            await GetDepartments();
+            Title = "Add";
+            StateHasChanged();
+        }
+    }
+    private async void EditClicked(Department dep)
+    {
+        Title = "Update";
+        Department = dep;
+        await GetDepartments();
+        await OpenDialog();
+
+    }
+
+    private async void DeleteClicked(Department dep)
+    {
+        var confirmModal = Modal.Show<ConfirmationDialog>($"Are you sure you wanna delete {dep.Name}?");
+        var result = await confirmModal.Result;
+
+        if (result.Cancelled) return;
+
+        var response = await departmentService.DeleteById(dep.Id, Constants.DepartmentBaseUrl);
+        if (await DisplayMassage(response.Flag, response.Massage))
+        {
+            await GetDepartments();
+            StateHasChanged();
+        }
+    }
+
+
+    private async Task<bool> DisplayMassage(bool flag, string massage)
+    {
+
+        if (flag)
+        {
+            var parameters = new ModalParameters()
+        .Add(nameof(DisplayMessage.Message), massage);
+            Modal.Show<DisplayMessage>("Succes", parameters);
+            return true;
+        }
+        else
+        {
+            var parameters = new ModalParameters()
+        .Add(nameof(DisplayMessage.Message), massage);
+            Modal.Show<DisplayMessage>("Alert", parameters);
+            return false;
+        }
+    }
+    public void Dispose()
+    {
+        allState.Action -= StateHasChanged;
+    }
+}

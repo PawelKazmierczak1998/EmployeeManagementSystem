@@ -1,0 +1,103 @@
+﻿
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-2 cursorStyle" @onclick=EmployeeClicked>
+            <div class="card border-primary">
+                <div class="card-header">
+                    <i class="bi bi-people text-primary"></i> Employees @if (Employees.Count != 0)
+                    {
+                        <span class="badge bg-primary fs-6"> @Employees.Count</span>
+                    }
+
+
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-2 cursorStyle" @onclick=VacationClicked>
+            <div class="card border-success">
+                <div class="card-header">
+                    <i class="bi bi-backpack3 text-success"></i> Vacation
+                    @if (Vacations.Count != 0)
+                    {
+                        <span class="badge bg-success fs-6">@Vacations.Count</span>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-2 cursorStyle" @onclick=OvertimeClicked>
+            <div class="card border-danger">
+                <div class="card-header">
+                    <i class="bi bi-stopwatch text-danger"></i> Overtime
+                    @if (Overtimes.Count != 0)
+                    {
+                        <span class="badge bg-danger fs-6">   @Overtimes.Count </span>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-2 cursorStyle" @onclick=DoctorClicked>
+            <div class="card border-warning">
+                <div class="card-header">
+                    <i class="bi bi-hospital text-warning"></i> Doctor
+                    @if (Doctor.Count != 0)
+                    {
+                        <span class="badge bg-warning fs-6">   @Doctor.Count </span>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-2 cursorStyle" @onclick=SanctionsClicked>
+            <div class="card border-info">
+                <div class="card-header">
+                    <i class="bi bi-x-octagon text-info"></i> Sanctions
+                    @if (Sanctions.Count != 0)
+                    {
+                        <span class="badge bg-info fs-6">   @Sanctions.Count </span>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-2 cursorStyle" @onclick=DepartmentClicked>
+            <div class="card border-dark">
+                <div class="card-header">
+                    <i class="bi bi-slack text-dark"></i> Departments
+                    @if (Departments.Count != 0)
+                    {
+                        <span class="badge bg-dark fs-6">   @Departments.Count </span>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    public List<Employee> Employees { get; set; } = new();
+    public List<Vacation> Vacations { get; set; } = new();
+    public List<Overtime> Overtimes { get; set; } = new();
+    public List<Doctor> Doctor { get; set; } = new();
+    public List<Sanction> Sanctions { get; set; } = new();
+    public List<Department> Departments { get; set; } = new();
+
+    private async Task GetAllList()
+    {
+        Employees = await employeeService.GetAll(Constants.EmployeeBaseUrl);
+        Vacations = await vacationService.GetAll(Constants.VacationBaseUrl);
+        Overtimes = await overtimeService.GetAll(Constants.OvertimeBaseUrl);
+        Doctor = await doctorService.GetAll(Constants.DoctorBaseUrl);
+        Sanctions = await sanctionService.GetAll(Constants.SanctionBaseUrl);
+        Departments = await departmentService.GetAll(Constants.DepartmentBaseUrl);
+    }
+    void DepartmentClicked() => allState.DepartmentClicked();
+    void VacationClicked() => allState.VacationClicked();
+    void OvertimeClicked() => allState.OvertimeClicked();
+    void DoctorClicked() => allState.HealthClicked();
+    void SanctionsClicked() => allState.SanctionClicked();
+    void EmployeeClicked() => allState.EmployeeClicked();
+
+
+    protected async override Task OnInitializedAsync()
+    {
+        await GetAllList();
+    }
+}

@@ -1,0 +1,182 @@
+﻿@implements IDisposable
+
+
+
+@if (allState.ShowUser)
+{
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="float-start">User</h4>
+                    </div>
+                    <div class="card-header" style="max-height:580px; overflow-x:hidden; overflow-y:scroll;">
+                        <div class="card-body">
+                            <table class="table table-striped ">
+                                <thead>
+                                    <tr>
+                                        <th scope="col"> #</th>
+                                        <th scope="col">Id</th>
+                                        <th scope="col">Full Name</th>
+                                        <th scope="col">Role</th>
+                                        <th scope="col">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (MenageUsers.Count <= 0)
+                                    {
+                                        <tr>
+                                            <td colspan="5"><div class="alert alert-info text-center">No User added yet!</div></td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+
+                                        int count = 1;
+                                        foreach (var item in MenageUsers)
+                                        {
+                                            <tr>
+                                                <th>@count</th>
+                                                <td>@item.UserId</td>
+                                                <td>@item.Name</td>
+                                                <td>@item.Role</td>
+                                                <td>
+                                                    <i class="bi bi-pencil text-info" @onclick="()=>EditClicked(item)"></i>
+                                                    <i class="bi bi-trash text-danger" @onclick="()=>DeleteClicked(item)"></i>
+                                                </td>
+                                            </tr>
+                                            count++;
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [CascadingParameter] public IModalService Modal { get; set; } = default!;
+    UserDialog? userDialog;
+    ManageUser ManageUser = new();
+
+    public string Title { get; set; } = "Add";
+
+    public List<ManageUser> MenageUsers { get; set; } = new();
+    public List<SystemRole> SystemRoles { get; set; } = new();
+
+
+    protected async override void OnInitialized()
+    {
+        await GetUsers();
+        await GetRoles();
+        allState.Action += StateHasChanged;
+    }
+
+    private async Task GetUsers()
+    {
+        MenageUsers = await accountService.GetUsers();
+    }
+    private async Task GetRoles()
+    {
+        SystemRoles = await accountService.GetRoles();
+    }
+
+    async Task OpenDialog()
+    {
+        var parameters = new ModalParameters()
+    .Add(nameof(UserDialog.ManageUser), ManageUser);
+
+
+        var form = Modal.Show<UserDialog>($"Update User", parameters);
+        var result = await form.Result;
+
+        if (result.Confirmed)
+        {
+            var temp = result.Data.ToString();
+
+            if (!string.IsNullOrEmpty(temp))
+            {
+                ManageUser.Role = temp;
+          
+                await HandleSaveOperationEvent(ManageUser);
+
+
+            }
+
+        }
+
+    }
+
+    private async Task HandleSaveOperationEvent(ManageUser manageUser)
+    {
+        bool successCheck = false;
+        var result = await accountService
+        .UpdateUser(manageUser);
+        successCheck = await DisplayMassage(result.Flag, result.Massage);
+
+
+        if (successCheck)
+        {
+            ManageUser = new();
+            await GetUsers();
+            StateHasChanged();
+        }
+        else
+        {
+            await DisplayMassage(successCheck, result.Massage);
+        }
+    }
+
+    private async void EditClicked(ManageUser user)
+    {
+        ManageUser = user;
+        await GetUsers();
+        await OpenDialog();
+
+    }
+
+    private async void DeleteClicked(ManageUser user)
+    {
+        var confirmModal = Modal.Show<ConfirmationDialog>($"Are you sure you wanna delete {user.Name}?");
+        var result = await confirmModal.Result;
+
+        if (result.Cancelled) return;
+
+        var response = await accountService.DeleteUser(user.UserId);
+        if (await DisplayMassage(response.Flag, response.Massage))
+        {
+            await GetUsers();
+            StateHasChanged();
+        }
+    }
+
+
+    private async Task<bool> DisplayMassage(bool flag, string massage)
+    {
+
+        if (flag)
+        {
+            var parameters = new ModalParameters()
+        .Add(nameof(DisplayMessage.Message), massage);
+            Modal.Show<DisplayMessage>("Succes", parameters);
+            return true;
+        }
+        else
+        {
+            var parameters = new ModalParameters()
+        .Add(nameof(DisplayMessage.Message), massage);
+            Modal.Show<DisplayMessage>("Alert", parameters);
+            return false;
+        }
+    }
+    public void Dispose()
+    {
+        allState.Action -= StateHasChanged;
+    }
+}
