@@ -1,0 +1,66 @@
+﻿@using BaseLibrary.Entities
+@using System.ComponentModel.DataAnnotations
+
+
+<div class="card border-success">
+    <EditForm Model="VacationType" OnValidSubmit="Save">
+        <div class="card-body">
+            <div class="form-group">
+                <label for="form-label"> Name:</label>
+                <InputText @bind-Value="VacationType.Name" class="form-control" />
+                <ValidationMessage For="()=>VacationType.Name" class="text-danger" />
+            </div>
+        </div>
+        <div class="card-footer text-center">
+            <div class="mx-auto">
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <button @onclick="Cancel" class="btn btn-secondary">Cancel</button>
+            </div>
+
+        </div>
+
+        <DataAnnotationsValidator />
+    </EditForm>
+</div>
+
+@code {
+
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+    [Parameter] public VacationType VacationType { get; set; } = new();
+    [Parameter] public EventCallback<VacationType> HandleSaveOperationEvent { get; set; }
+
+
+    protected override async void OnInitialized()
+    {
+
+
+        allState.Action += StateHasChanged;
+        StateHasChanged();
+    }
+
+
+    async Task Save()
+    {
+        var returnData = $"{VacationType.Name}";
+
+        if (string.IsNullOrEmpty(VacationType.Name))
+        {
+
+        }
+        else
+        {
+
+
+            await HandleSaveOperationEvent.InvokeAsync(VacationType);
+            await BlazoredModal.CloseAsync(ModalResult.Ok(returnData));
+        }
+
+    }
+
+
+
+    async Task Cancel() => await BlazoredModal.CancelAsync();
+
+
+}
+

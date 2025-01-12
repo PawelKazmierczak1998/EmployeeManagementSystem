@@ -1,0 +1,207 @@
+﻿@if (allState.ShowVacationType)
+{
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="float-start">Overtime Types</h4>
+                        <button class="btn btn-outline-success float-end" @onclick="AddOpenDialog"><i class="bi bi-plus-circle-doted"></i>Add  Vacation Type</button>
+                    </div>
+                    <div class="card-header" style="max-height:580px; overflow-x:hidden; overflow-y:scroll;">
+                        <div class="card-body">
+                            <table class="table table-striped ">
+                                <thead>
+                                    <tr>
+                                        <th scope="col"> #</th>
+                                        <th scope="col">Id</th>
+                                        <th scope="col">Type</th>
+                                        <th scope="col">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (VacationTypes.Count <= 0)
+                                    {
+                                        <tr>
+                                            <td colspan="5"><div class="alert alert-info text-center">No Vacation Types added yet!</div></td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+
+                                        int count = 1;
+                                        foreach (var item in VacationTypes)
+                                        {
+                                            <tr>
+                                                <th>@count</th>
+                                                <td>@item.Id</td>
+                                                <td>@item.Name</td>
+                                                <td>
+                                                    <i class="bi bi-pencil text-info" @onclick="()=>EditClicked(item)"></i>
+                                                    <i class="bi bi-trash text-danger" @onclick="()=>DeleteClicked(item)"></i>
+                                                </td>
+                                            </tr>
+                                            count++;
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [CascadingParameter] public IModalService Modal { get; set; } = default!;
+    public VacationType VacationType { get; set; } = new();
+    public List<VacationType> VacationTypes { get; set; } = new();
+    public string Title { get; set; } = "Add";
+
+    protected async override void OnInitialized()
+    {
+        await GetVacationTypes();
+        allState.Action += StateHasChanged;
+    }
+    private async Task GetVacationTypes()
+    {
+        VacationTypes = await vacationTypeService.GetAll(Constants.VacationTypeBaseUrl);
+    }
+
+    async Task AddOpenDialog()
+    {
+        Title = "Add";
+        VacationType = new();
+        await OpenDialog();
+    }
+    async Task OpenDialog()
+    {
+
+        if (Title == "Update")
+        {
+            var parameters = new ModalParameters()
+        .Add(nameof(VacationTypeDialog.VacationType), VacationType);
+
+
+            var form = Modal.Show<DepartmentDialog>($"{Title} Overtime Type", parameters);
+            var result = await form.Result;
+
+            if (result.Confirmed)
+            {
+                var temp = result.Data.ToString().Split(';');
+
+
+                if (temp.Length == 2)
+                {
+                    VacationType.Name = temp[0];
+
+
+                    await HandleSaveOperationEvent(VacationType);
+
+
+                }
+
+            }
+        }
+        else
+        {
+            var form = Modal.Show<DepartmentDialog>($"{Title}  Vacation Type");
+            var result = await form.Result;
+
+            if (result.Confirmed)
+            {
+                var temp = result.Data.ToString().Split(';');
+
+
+                if (temp.Length == 2)
+                {
+                    VacationType.Name = temp[0];
+
+
+                    await HandleSaveOperationEvent(VacationType);
+
+
+
+                }
+
+            }
+        }
+    }
+
+    private async Task HandleSaveOperationEvent(VacationType vacationType)
+    {
+        bool successCheck = false;
+        if (vacationType.Id > 0)
+        {
+            var result = await vacationTypeService
+            .Update(vacationType, Constants.VacationTypeBaseUrl);
+            successCheck = await DisplayMassage(result.Flag, result.Massage);
+
+        }
+        else
+        {
+            var response = await vacationTypeService
+            .Insert(vacationType, Constants.VacationTypeBaseUrl);
+            successCheck = await DisplayMassage(response.Flag, response.Massage);
+
+        }
+        if (successCheck)
+        {
+            VacationType = new();
+            await GetVacationTypes();
+            Title = "Add";
+            StateHasChanged();
+        }
+    }
+    private async void EditClicked(VacationType dep)
+    {
+        Title = "Update";
+        VacationType = dep;
+        await GetVacationTypes();
+        await OpenDialog();
+
+    }
+
+    private async void DeleteClicked(VacationType dep)
+    {
+        var confirmModal = Modal.Show<ConfirmationDialog>($"Are you sure you wanna delete {dep.Name}?");
+        var result = await confirmModal.Result;
+
+        if (result.Cancelled) return;
+
+        var response = await vacationTypeService.DeleteById(dep.Id, Constants.VacationTypeBaseUrl);
+        if (await DisplayMassage(response.Flag, response.Massage))
+        {
+            await GetVacationTypes();
+            StateHasChanged();
+        }
+    }
+
+
+    private async Task<bool> DisplayMassage(bool flag, string massage)
+    {
+
+        if (flag)
+        {
+            var parameters = new ModalParameters()
+        .Add(nameof(DisplayMessage.Message), massage);
+            Modal.Show<DisplayMessage>("Succes", parameters);
+            return true;
+        }
+        else
+        {
+            var parameters = new ModalParameters()
+        .Add(nameof(DisplayMessage.Message), massage);
+            Modal.Show<DisplayMessage>("Alert", parameters);
+            return false;
+        }
+    }
+
+    public void Dispose()
+    {
+        allState.Action -= StateHasChanged;
+    }
+
+}

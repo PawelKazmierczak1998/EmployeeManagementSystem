@@ -38,6 +38,18 @@
                                             <i class="bi bi-pencil text-info" @onclick="()=>EditClicked(employee)"></i>
                                             <i class="bi bi-trash text-danger" @onclick="()=>DeleteClicked(employee)"></i>
                                             <i class="bi bi-file-person text-danger" @onclick="()=>ViewClicked(employee)"></i>
+                                            <hr />
+                                            <i class="bi bi-hospital text-warning" @onclick="()=>AddHealthClicked(employee)"></i>
+                                            @if (OvertimeTypes.Count() != 0 || SanctionTypes.Count() != 0 || VacationTypes.Count() != 0)
+                                            {
+                                                <i class="bi bi-stopwatch text-danger" @onclick="()=>AddOvertimeClicked(employee)"></i>
+                                                <i class="bi bi-octagon text-info" @onclick="()=>AddSanctionClicked(employee)"></i>
+                                                <i class="bi bi-backpack3 text-success" @onclick="()=>AddVacationClicked(employee)"></i>
+                                            }
+                                            else{
+                                                <span> Add Types First</span>
+                                            }
+
                                         </div>
 
                                     }
@@ -89,6 +101,7 @@ HandleSaveEmployeeClickedEvent="HandleSaveEmployeeClickedEvent" />
     EmployeeDetailPage? employeeDetailPage;
     public List<Employee> Employees { get; set; } = [];
     public Employee Employee { get; set; } = new();
+    public Doctor Doctor { get; set; } = new();
     public string Title { get; set; } = "Add";
     public List<Country> DefaultCountries { get; set; } = [];
     public List<City> DefaultCities { get; set; } = [];
@@ -103,12 +116,28 @@ HandleSaveEmployeeClickedEvent="HandleSaveEmployeeClickedEvent" />
     public List<City> SelectedCities { get; set; } = [];
     public List<Town> SelectedTowns { get; set; } = [];
 
+    public List<OvertimeType> OvertimeTypes { get; set; } = [];
+    public List<SanctionType> SanctionTypes { get; set; } = [];
+    public List<VacationType> VacationTypes { get; set; } = [];
+
+
     protected async override Task OnInitializedAsync()
     {
         allState.Action += StateHasChanged;
         await LoadEmployees();
         await LoadDefaults();
+        await GetTypesCount();
     }
+
+    private async Task GetTypesCount()
+    {
+        OvertimeTypes = await overtimeTypeService.GetAll(Constants.OvertimeTypeBaseUrl) ;
+        SanctionTypes = await sanctionTypeService.GetAll(Constants.SanctionTypeBaseUrl);
+        VacationTypes = await vacationTypeService.GetAll(Constants.VacationTypeBaseUrl);
+
+    }
+
+
 
     // inforumje kiedy formularz został zamkniety
     private async Task NotifyPerentFormCloseClicked()
@@ -219,9 +248,148 @@ HandleSaveEmployeeClickedEvent="HandleSaveEmployeeClickedEvent" />
     private async void ViewClicked(Employee employee)
     {
         Employee = employee;
-        //employeeDetailPage.Employee = employee;
+
         ShowDetailsPage = true;
         ShowMainPage = false;
+    }
+
+
+    private async void AddHealthClicked(Employee employee)
+    {
+
+
+
+        var parameters = new ModalParameters()
+        .Add(nameof(DoctorDialog.i), employee.Id);
+
+        var form = Modal.Show<DoctorDialog>($"Add Employee Health Issue", parameters);
+        var result = await form.Result;
+
+        if (result.Confirmed)
+        {
+            var temp = result.Data.ToString().Split(';');
+            // await DisplayMassage(false, $"Data:{temp[0]}, MedicalDiagnose:{temp[1]}, MedicalRecommendation: {temp[2]}");
+
+            Doctor.Date = DateTime.Parse(temp[0]);
+            Doctor.MedicalDiagnose = temp[1];
+            Doctor.MedicalRecommendation = temp[2];
+            Doctor.EmployeeId = int.Parse(temp[3]);
+            await SaveHealthEvent(Doctor, Doctor.EmployeeId);
+        }
+
+    }
+    Overtime Overtime = new();
+    private async void AddOvertimeClicked(Employee employee)
+    {
+
+
+
+        var parameters = new ModalParameters()
+        .Add(nameof(OvertimeDialog.i), employee.Id);
+
+        var form = Modal.Show<OvertimeDialog>($"Add Employee Overtime Information", parameters);
+        var result = await form.Result;
+
+        if (result.Confirmed)
+        {
+            var temp = result.Data.ToString().Split(';');
+            Overtime.EmployeeId = int.Parse(temp[3]);
+            Overtime.StartDate = DateTime.Parse(temp[1]);
+            Overtime.EndDate = DateTime.Parse(temp[2]);
+            Overtime.OvertimeTypeId = int.Parse(temp[4]);
+            await SaveOvertimeEvent(Overtime);
+        }
+
+    }
+    async Task SaveOvertimeEvent(Overtime item)
+    {
+        var (flag, massage) = await overtimeService.Insert(item, Constants.OvertimeBaseUrl);
+        var response = await DisplayMassage(flag, massage);
+        if (response)
+        {
+            Overtime = new();
+        }
+    }
+
+    Sanction Sanction = new();
+    private async void AddSanctionClicked(Employee employee)
+    {
+
+
+
+        var parameters = new ModalParameters()
+        .Add(nameof(SanctionDialog.i), employee.Id);
+
+        var form = Modal.Show<SanctionDialog>($"Add Employee Sanction Information", parameters);
+        var result = await form.Result;
+
+        if (result.Confirmed)
+        {
+            var temp = result.Data.ToString().Split(';');
+            Sanction.EmployeeId = int.Parse(temp[3]);
+            Sanction.Date = DateTime.Parse(temp[1]);
+            Sanction.PunishmentDate = DateTime.Parse(temp[2]);
+            Sanction.SanctionTypeId = int.Parse(temp[4]);
+            Sanction.Punishment = temp[5];
+            await SaveSanctionEvent(Sanction);
+        }
+
+    }
+    async Task SaveSanctionEvent(Sanction item)
+    {
+        var (flag, massage) = await sanctionService.Insert(item, Constants.SanctionBaseUrl);
+        var response = await DisplayMassage(flag, massage);
+        if (response)
+        {
+            Sanction = new();
+        }
+    }
+
+    Vacation Vacation = new();
+    private async void AddVacationClicked(Employee employee)
+    {
+
+
+
+        var parameters = new ModalParameters()
+        .Add(nameof(VacationDialog.i), employee.Id);
+
+        var form = Modal.Show<VacationDialog>($"Add Employee Vacation Information", parameters);
+        var result = await form.Result;
+
+        if (result.Confirmed)
+        {
+            var temp = result.Data.ToString().Split(';');
+
+
+            Vacation.StartDate = DateTime.Parse(temp[0]);
+            Vacation.EmployeeId = int.Parse(temp[1]);
+            Vacation.VacationTypeId = int.Parse(temp[2]);
+            Vacation.NumberOfDays = int.Parse(temp[3]);
+            
+            await SaveVacationEvent(Vacation);
+        }
+
+    }
+    async Task SaveVacationEvent(Vacation item)
+    {
+        var (flag, massage) = await vacationService.Insert(item, Constants.VacationBaseUrl);
+        var response = await DisplayMassage(flag, massage);
+        if (response)
+        {
+            Vacation = new();
+        }
+    }
+
+    async Task SaveHealthEvent(Doctor item,int employeeId)
+    {
+        item.EmployeeId = employeeId;
+        var (flag, massage) = await doctorService.Insert(item,Constants.DoctorBaseUrl);
+        var response = await DisplayMassage(flag, massage);
+        if(response)
+        {
+            Doctor = new();
+        }
     }
 
     void HandleDetailsPageClosedClicked()

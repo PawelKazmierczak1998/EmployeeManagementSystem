@@ -1,0 +1,102 @@
+﻿@using BaseLibrary.Entities
+@using System.ComponentModel.DataAnnotations
+
+
+<div class="card border-success">
+    <EditForm Model="Vacation" OnValidSubmit="Save">
+        <div class="card-body">
+            <div class="form-group">
+                <label for="form-label">Employee Id:</label>
+                <InputNumber @bind-Value="Vacation.EmployeeId" class="form-control" disabled />
+            </div>
+            <div class="form-group">
+                <label for="form-label">Number Of Days :</label>
+                <InputNumber @bind-Value="Vacation.NumberOfDays" class="form-control" />
+            </div>
+            <div class="form-group mt-2">
+                <label for="form-label">Start Date:</label>
+                <InputDate @bind-Value="Vacation.StartDate" class="form-control" />
+            </div>
+            <div class="form-group mt-2">
+                <label for="form-label">End Date:</label>
+                <input value="@Vacation.EndDate" class="form-control" disabled/>
+            </div>
+            <div class="form-group mt2">
+                <label for="form-label">Type:</label>
+                <select id="VacationTypes" @onchange="OnValueChangeOvertimeTypes">
+                    <option value="0">-- Select a Vacation Type --</option>
+                    @foreach (var item in VacationTypes)
+                    {
+                        <option value="@item.Id">@item.Name</option>
+                    }
+                </select>
+
+            </div>
+
+        </div>
+        <div class="card-footer text-center">
+            <div class="mx-auto">
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <button @onclick="Cancel" class="btn btn-secondary">Cancel</button>
+            </div>
+
+        </div>
+
+        <DataAnnotationsValidator />
+    </EditForm>
+</div>
+
+@code {
+
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+    [Parameter] public int i { get; set; } = 0;
+    [Parameter] public Vacation Vacation { get; set; } = new();
+    [Parameter] public List<VacationType> VacationTypes { get; set; } = new();
+
+    [Parameter] public EventCallback<Vacation> HandleSaveOperationEvent { get; set; }
+
+
+    protected override async void OnInitialized()
+    {
+        if (i != 0)
+        {
+            Vacation.EmployeeId = i;
+            Vacation.StartDate = DateTime.Now;
+        }
+        VacationTypes = await vacationTypeService.GetAll(Constants.VacationTypeBaseUrl);
+        
+        allState.Action += StateHasChanged;
+        StateHasChanged();
+    }
+
+
+    async Task Save()
+    {
+        var returnData = $"{Vacation.StartDate};{Vacation.EmployeeId};{Vacation.VacationTypeId};{Vacation.NumberOfDays}";
+
+
+
+        await HandleSaveOperationEvent.InvokeAsync(Vacation);
+        await BlazoredModal.CloseAsync(ModalResult.Ok(returnData));
+
+
+    }
+
+    public void OnValueChangeOvertimeTypes(ChangeEventArgs args)
+    {
+        if (int.TryParse(args.Value?.ToString(), out int vacationTypeId))
+        {
+            Vacation.VacationTypeId = vacationTypeId;
+        }
+        else
+        {
+
+        }
+    }
+
+
+    async Task Cancel() => await BlazoredModal.CancelAsync();
+
+
+}
+

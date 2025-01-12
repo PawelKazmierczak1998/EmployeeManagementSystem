@@ -1,0 +1,95 @@
+﻿@using BaseLibrary.Entities
+@using System.ComponentModel.DataAnnotations
+
+
+<div class="card border-success">
+    <EditForm Model="Sanction" OnValidSubmit="Save">
+        <div class="card-body">
+            <div class="form-group">
+                <label for="form-label">Employee Id:</label>
+                <InputNumber @bind-Value="Sanction.EmployeeId" class="form-control" disabled />
+            </div>
+            <div class="form-group mt-2">
+                <label for="form-label">Date:</label>
+                <InputDate @bind-Value="Sanction.Date" class="form-control" />
+            </div>
+            <div class="form-group mt2">
+                <label for="form-label">PunishmentDate :</label>
+                <InputDate @bind-Value="Sanction.PunishmentDate" class="form-control" />
+            </div>         
+            <div class="form-group mt2">
+
+                <select id="SanctionTypes" @onchange="OnValueChangeOvertimeTypes">
+                    <option value="0">-- Select a Sanction Type --</option>
+                    @foreach (var item in SanctionTypes)
+                    {
+                        <option value="@item.Id">@item.Name</option>
+                    }
+                </select>
+
+            </div>
+            <div class="form-group mt2">
+                <label for="form-label">Punishment Note :</label>
+                <InputText @bind-Value="Sanction.Punishment" class="form-control" />
+            </div>
+        </div>
+        <div class="card-footer text-center">
+            <div class="mx-auto">
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <button @onclick="Cancel" class="btn btn-secondary">Cancel</button>
+            </div>
+
+        </div>
+
+        <DataAnnotationsValidator />
+    </EditForm>
+</div>
+
+@code {
+
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+    [Parameter] public int i { get; set; }
+    [Parameter] public Sanction Sanction { get; set; } = new();
+    [Parameter] public List<SanctionType> SanctionTypes { get; set; } = new();
+
+    [Parameter] public EventCallback<Sanction> HandleSaveOperationEvent { get; set; }
+
+
+    protected override async void OnInitialized()
+    {
+        SanctionTypes = await sanctionTypeService.GetAll(Constants.SanctionTypeBaseUrl);
+        Sanction.EmployeeId = i;
+        Sanction.Date = DateTime.Now;
+        Sanction.PunishmentDate = DateTime.Now.AddMonths(12);
+        allState.Action += StateHasChanged;
+        StateHasChanged();
+    }
+
+
+    async Task Save()
+    {
+        var returnData = $"{Sanction.Id};{Sanction.Date};{Sanction.PunishmentDate};{Sanction.EmployeeId};{Sanction.SanctionTypeId};{Sanction.Punishment}";
+
+
+
+        await HandleSaveOperationEvent.InvokeAsync(Sanction);
+        await BlazoredModal.CloseAsync(ModalResult.Ok(returnData));
+
+
+    }
+
+    public void OnValueChangeOvertimeTypes(ChangeEventArgs args)
+    {
+        if (int.TryParse(args.Value?.ToString(), out int sanctionTypeId))
+        {
+            Sanction.SanctionTypeId = sanctionTypeId;
+        }
+
+    }
+
+
+    async Task Cancel() => await BlazoredModal.CancelAsync();
+
+
+}
+
