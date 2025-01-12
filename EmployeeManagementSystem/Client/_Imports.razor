@@ -1,0 +1,64 @@
+﻿@using System.Net.Http
+@using System.Net.Http.Json
+@using BaseLibrary.Entities
+@using Client.ApplicationStates
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+@using Microsoft.AspNetCore.Components.WebAssembly.Http
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using Microsoft.JSInterop
+@using Client
+@using Client.Layout
+@using Client.Pages.ContentPages.DepartmentPages
+@using Client.Pages.ContentPages.LocationPages
+@using BaseLibrary.DTOs
+@using ClientLibrary.Helpers
+@using Microsoft.AspNetCore.Components.Authorization
+@using ClientLibrary.Services.Contracts
+@using Client.Pages.Other
+@using Blazored.Modal
+@using Blazored.Modal.Services
+@using Client.Pages.UserPages
+@using Client.Pages.EmployeePages
+@using Client.Pages.Other.DoctorPages
+@using Client.Pages.Other.OvertimePages
+@using Client.Pages.Other.SanctionsPages
+@using Client.Pages.Other.VacationPages
+
+
+@inject AuthenticationStateProvider AuthStateProvider
+@inject IUserAccountService accountService
+@inject NavigationManager NavManager
+
+@*/Authentication*@
+@inject IUserAccountService accountService
+
+@* /Navbar tab communication state handling*@
+@inject AllState allState
+
+@* /General Departments /Department /Branch*@
+@inject IGenericServiceInterface<GeneralDepartment> generalDepartmentService
+@inject IGenericServiceInterface<Department> departmentService
+@inject IGenericServiceInterface<Branch> branchService
+
+@* /Country /City /Town*@
+@inject IGenericServiceInterface<Country> countryService
+@inject IGenericServiceInterface<City> cityService
+@inject IGenericServiceInterface<Town> townService
+
+@* /Employee*@
+@inject IGenericServiceInterface<Employee> employeeService
+
+@* /Overtime /vacation /sanction /doctor *@
+@inject IGenericServiceInterface<Overtime> overtimeService
+@inject IGenericServiceInterface<OvertimeType> overtimeTypeService
+
+@inject IGenericServiceInterface<Vacation> vacationService
+@inject IGenericServiceInterface<VacationType> vacationTypeService
+
+@inject IGenericServiceInterface<Sanction> sanctionService
+@inject IGenericServiceInterface<SanctionType> sanctionTypeService
+
+@inject IGenericServiceInterface<Doctor> doctorService

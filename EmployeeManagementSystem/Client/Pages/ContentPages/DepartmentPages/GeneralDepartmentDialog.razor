@@ -1,0 +1,60 @@
+﻿@using BaseLibrary.Entities
+@using System.ComponentModel.DataAnnotations
+
+
+<div class="card border-success">
+    <EditForm Model="GeneralDepartment" OnValidSubmit="Save">
+        <div class="card-body">
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <InputText @bind-Value="GeneralDepartment.Name" class="form-control" placeholder="Enter a name" />
+                <ValidationMessage For="@(() => GeneralDepartment.Name)" />
+            </div>
+        </div>
+        <div class="card-footer text-center">
+            <div class="mx-auto">
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <button @onclick="Cancel" class="btn btn-secondary">Cancel</button>
+            </div>
+
+        </div>
+
+        <DataAnnotationsValidator />
+    </EditForm>
+</div>
+
+@code {
+
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+    [Parameter] public GeneralDepartment GeneralDepartment { get; set; } = new();
+    [Parameter] public string Title { get; set; } = "Add";
+    [Parameter] public EventCallback<GeneralDepartment> HandleSaveOperationEvent { get; set; }
+
+    protected override void OnInitialized()
+    {
+        StateHasChanged();
+    }
+
+
+    async Task Save()
+    {
+
+        var returnData = $"{GeneralDepartment.Id};{GeneralDepartment.Name}";
+        if (!string.IsNullOrWhiteSpace(GeneralDepartment.Name))
+        {
+            // Zakończenie modalu z wynikiem OK
+            await HandleSaveOperationEvent.InvokeAsync(GeneralDepartment);
+            await BlazoredModal.CloseAsync(ModalResult.Ok(returnData));
+        }
+        else
+        {
+            // Pokaż walidację
+            Console.WriteLine("Validation failed: Name is required.");
+        }
+    }
+
+    async Task Cancel() => await BlazoredModal.CancelAsync();
+
+
+}
+

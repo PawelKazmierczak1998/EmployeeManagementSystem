@@ -1,0 +1,141 @@
+﻿@if (allState.ShowSanction)
+{
+    <div class="container-fluid mt-5">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header"> <h4 class="float-start"> Sanction Information </h4></div>
+                    <div class="card-header">
+                        <button class="btn btn-outline-success float-end" @onclick="SanctionTypeButtonClicked"><i class="bi bi-plus-circle-doted"></i>Sanction Type</button>
+                    </div>
+                    <div class="card-body">
+                        <QuickGrid Items="Sanctions.AsQueryable()">
+                            <PropertyColumn Title="Employee Id" Property="e=>e.EmployeeId" />
+                            <PropertyColumn Title="Start Date" Property="e=>e.Date" />
+                            <PropertyColumn Title="Expiry Date" Property="e=>e.PunishmentDate" />
+                            <PropertyColumn Title="Punishment Note" Property="e=>e.Punishment" />
+                            <PropertyColumn Title="Type" Property="e=>e.SanctionType.Name" />
+                            <TemplateColumn Title="Action">
+                                @{
+                                    var sanction = (context as Sanction);
+                                    <div>
+                                        <i class="bi bi-pencil text-info" @onclick="()=>EditButtonClicked(sanction)"></i>
+                                        <i class="bi bi-trash text-danger" @onclick="()=>DeleteButtonClicked(sanction)"></i>
+                                       
+                                    </div>
+
+                                }
+                            </TemplateColumn>
+                        </QuickGrid>
+                    </div>
+                    <div class="card-footer"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+        [CascadingParameter] public IModalService Modal { get; set; } = default!;
+    public Sanction Sanction { get; set; } = new();
+    public List<Sanction> Sanctions { get; set; } = new();
+    public string Title { get; set; } = "Add";
+
+    protected async override Task OnInitializedAsync()
+    {
+        await GetSanctions();
+        allState.Action += StateHasChanged;
+
+    }
+
+    public async Task GetSanctions()
+    {
+        Sanctions = await sanctionService.GetAll(Constants.SanctionBaseUrl);
+    }
+
+    public void SanctionTypeButtonClicked()
+    {
+        allState.SanctionTypeClicked();
+    }
+    public async void DeleteButtonClicked(Sanction sanction)
+    {
+        var confirmModal = Modal.Show<ConfirmationDialog>($"Are you sure you wanna delete {sanction.EmployeeId}?");
+        var result = await confirmModal.Result;
+
+        if (result.Cancelled) return;
+
+        var response = await sanctionService.DeleteById(sanction.Id, Constants.SanctionBaseUrl);
+        if (await DisplayMassage(response.Flag, response.Massage))
+        {
+            await GetSanctions();
+            StateHasChanged();
+        }
+    }
+
+    private async void AddHealthClicked(Sanction sanction)
+    {
+
+        if (Title.Contains("Update"))
+        {
+            var parameters = new ModalParameters()
+                    .Add(nameof(SanctionDialog.i), sanction.EmployeeId);
+
+            var form = Modal.Show<OvertimeDialog>($"Update Employee Sanction Information", parameters);
+            var result = await form.Result;
+
+            if (result.Confirmed)
+            {
+                var temp = result.Data.ToString().Split(';');
+                // await DisplayMassage(false, $"Data:{temp[0]}, MedicalDiagnose:{temp[1]}, MedicalRecommendation: {temp[2]}");
+                Sanction.Id = int.Parse(temp[0]);
+                Sanction.EmployeeId = int.Parse(temp[3]);
+                Sanction.Date = DateTime.Parse(temp[1]);
+                Sanction.PunishmentDate = DateTime.Parse(temp[2]);
+                Sanction.SanctionTypeId = int.Parse(temp[4]);
+                Sanction.Punishment = temp[5];
+                await SaveOvertimeEvent(Sanction, Sanction.EmployeeId);
+            }
+
+        }
+
+
+
+    }
+    async Task SaveOvertimeEvent(Sanction item, int employeeId)
+    {
+        item.EmployeeId = employeeId;
+        var (flag, massage) = await sanctionService.Update(item, Constants.SanctionBaseUrl);
+        var response = await DisplayMassage(flag, massage);
+        if (response)
+        {
+            Sanction = new();
+        }
+    }
+    public void EditButtonClicked(Sanction sanction)
+    {
+        Title = "Update";
+        AddHealthClicked(sanction);
+    }
+    private async Task<bool> DisplayMassage(bool flag, string massage)
+    {
+
+        if (flag)
+        {
+            var parameters = new ModalParameters()
+            .Add(nameof(DisplayMessage.Message), massage);
+            Modal.Show<DisplayMessage>
+                ("Succes", parameters);
+            return true;
+        }
+        else
+        {
+            var parameters = new ModalParameters()
+            .Add(nameof(DisplayMessage.Message), massage);
+            Modal.Show<DisplayMessage>
+                ("Alert", parameters);
+            return false;
+        }
+    }
+
+    public void Dispose() => allState.Action -= StateHasChanged;
+}

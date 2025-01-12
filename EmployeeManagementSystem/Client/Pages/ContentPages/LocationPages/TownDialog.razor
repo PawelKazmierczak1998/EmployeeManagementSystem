@@ -1,0 +1,105 @@
+﻿@using BaseLibrary.Entities
+@using System.ComponentModel.DataAnnotations
+
+
+<div class="card border-success">
+    <EditForm Model="Town" OnValidSubmit="Save">
+        <div class="card-body">
+            <div class="form-group">
+                <label for="form-label">Id:</label>
+                <input @bind="Town.Id" class="form-control" disabled />
+                <ValidationMessage For="@(() => Town.Id)" />
+            </div>
+            <div class="form-group">
+                <label for="form-label">Name:</label>
+                <InputText @bind-Value="Town.Name" class="form-control" />
+                <ValidationMessage For="@(() => Town.Name)" />
+            </div>
+            <div class="form-group mt-3 mb-3">
+                <label for="form-label">Select City:</label>
+                @if (Town.City != null)
+                {
+                    string slected = Town.City!.Name;
+                    <select id="Cityes" @onchange="OnValueChange">
+                        <option value="0">@slected</option>
+                        @foreach (var item in Cityes)
+                        {
+                            <option value="@item.Id">@item.Name</option>
+                        }
+                    </select>
+                }
+                else
+                {
+                    <select id="Countryes" @onchange="OnValueChange">
+                        <option value="0">-- Select a Department --</option>
+                        @foreach (var item in Cityes)
+                        {
+                            <option value="@item.Id">@item.Name</option>
+                        }
+                    </select>
+                }
+
+            </div>
+        </div>
+        <div class="card-footer text-center">
+            <div class="mx-auto">
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <button @onclick="Cancel" class="btn btn-secondary">Cancel</button>
+            </div>
+
+        </div>
+
+        <DataAnnotationsValidator />
+    </EditForm>
+</div>
+
+@code {
+
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+
+    [Parameter] public Town Town { get; set; } = new();
+
+    [Parameter] public List<City> Cityes { get; set; } = new();
+
+    [Parameter] public EventCallback<Town> HandleSaveOperationEvent { get; set; }
+
+
+    [Parameter] public string Title { get; set; } = "Add";
+    protected override async void OnInitialized()
+    {
+        Cityes = await cityService.GetAll(Constants.CityBaseUrl);
+        StateHasChanged();
+    }
+
+
+    async Task Save()
+    {
+        var returnData = $"{Town.Name};{Town.CityId.ToString()}";
+
+        if (string.IsNullOrEmpty(Town.Name) || Town.CityId <= 0)
+        {
+
+        }
+        else
+        {
+
+
+            await HandleSaveOperationEvent.InvokeAsync(Town);
+            await BlazoredModal.CloseAsync(ModalResult.Ok(returnData));
+        }
+
+    }
+
+    public void OnValueChange(ChangeEventArgs args)
+    {
+        if (int.TryParse(args.Value?.ToString(), out int CityId))
+        {
+            Town.CityId = CityId;
+        }
+    }
+
+    async Task Cancel() => await BlazoredModal.CancelAsync();
+
+
+}
+

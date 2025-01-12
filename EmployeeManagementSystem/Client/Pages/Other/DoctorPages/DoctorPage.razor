@@ -1,0 +1,159 @@
+﻿@if (allState.ShowHealth)
+{
+    <div class="container-fluid mt-5">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header"> <h4 class="float-start"> Health Information </h4></div>
+                    <div class="card-header">
+
+                    </div>
+                    <div class="card-body">
+                        <QuickGrid Items="Doctors.AsQueryable()">
+                            <PropertyColumn Title="Employee Id" Property="e=>e.EmployeeId" />
+                            <PropertyColumn Title="Date" Property="e=>e.Date" />
+                            <PropertyColumn Title="Medical Diagnose" Property="e=>e.MedicalDiagnose" />
+                            <PropertyColumn Title="Medical Recommendation" Property="e=>e.MedicalRecommendation" />
+                            <TemplateColumn Title="Action">
+                                @{
+                                    var doctor = (context as Doctor);
+                                    <div>
+                                        <i class="bi bi-pencil text-info" @onclick="()=>EditButtonClicked(doctor)"></i>
+                                        <i class="bi bi-trash text-danger" @onclick="()=>DeleteButtonClicked(doctor)"></i>
+                                    </div>
+
+                                }
+                            </TemplateColumn>
+                        </QuickGrid>
+                    </div>
+                    <div class="card-footer"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [CascadingParameter] public IModalService Modal { get; set; } = default!;
+    public Doctor Doctor { get; set; } = new();
+    public List<Doctor> Doctors { get; set; } = new();
+    public string Title { get; set; } = "Add";
+
+    protected async override Task OnInitializedAsync()
+    {
+        await GetHealth();
+        allState.Action += StateHasChanged;
+
+    }
+
+    public async Task GetHealth()
+    {
+        Doctors = await doctorService.GetAll(Constants.DoctorBaseUrl);
+    }
+
+    public async void DeleteButtonClicked(Doctor doctor)
+    {
+        var confirmModal = Modal.Show<ConfirmationDialog>($"Are you sure you wanna delete {doctor.Id}?");
+        var result = await confirmModal.Result;
+
+        if (result.Cancelled) return;
+       
+        var response = await doctorService.DeleteById(doctor.Id, Constants.DoctorBaseUrl);
+        if (await DisplayMassage(response.Flag, response.Massage))
+        {
+            await GetHealth();
+            StateHasChanged();
+        }
+    }
+
+    private async void AddHealthClicked(Doctor doctor)
+    {
+
+        if (Title.Contains("Update"))
+        {
+
+            var parameter = new ModalParameters().Add(nameof(DoctorDialog.i),doctor.EmployeeId);
+
+            var form = Modal.Show<DoctorDialog>($"{Title} Employee Health Issue", parameter);
+            var result = await form.Result;
+
+            if (result.Confirmed)
+            {
+                var temp = result.Data.ToString().Split(';');
+                // await DisplayMassage(false, $"Data:{temp[0]}, MedicalDiagnose:{temp[1]}, MedicalRecommendation: {temp[2]}");
+
+                Doctor.Date = DateTime.Parse(temp[0]);
+                Doctor.MedicalDiagnose = temp[1];
+                Doctor.MedicalRecommendation = temp[2];
+                Doctor.EmployeeId = int.Parse(temp[3]);
+                await SaveHealthEvent(Doctor, Doctor.EmployeeId);
+                Title = "Add";
+            }
+
+        }
+        else
+        {
+            var form = Modal.Show<DoctorDialog>($"{Title} Employee Health Issue");
+            var result = await form.Result;
+
+            if (result.Confirmed)
+            {
+                var temp = result.Data.ToString().Split(';');
+                // await DisplayMassage(false, $"Data:{temp[0]}, MedicalDiagnose:{temp[1]}, MedicalRecommendation: {temp[2]}");
+
+                Doctor.Date = DateTime.Parse(temp[0]);
+                Doctor.MedicalDiagnose = temp[1];
+                Doctor.MedicalRecommendation = temp[2];
+                Doctor.EmployeeId = int.Parse(temp[3]);
+                await SaveHealthEvent(Doctor, Doctor.EmployeeId);
+                Title = "Add";
+            }
+
+        }
+
+
+
+
+
+
+    }
+    async Task SaveHealthEvent(Doctor item, int employeeId)
+    {
+        item.EmployeeId = employeeId;
+        var (flag, massage) = await doctorService.Update(item, Constants.DoctorBaseUrl);
+        var response = await DisplayMassage(flag, massage);
+        if (response)
+        {
+
+            Doctor = new();
+            await GetHealth();
+        }
+    }
+    public void EditButtonClicked(Doctor doctor)
+    {
+        Title = "Update";
+        AddHealthClicked(doctor);
+    }
+    private async Task<bool> DisplayMassage(bool flag, string massage)
+    {
+
+        if (flag)
+        {
+            var parameters = new ModalParameters()
+            .Add(nameof(DisplayMessage.Message), massage);
+            Modal.Show<DisplayMessage>
+                ("Succes", parameters);
+            return true;
+        }
+        else
+        {
+            var parameters = new ModalParameters()
+            .Add(nameof(DisplayMessage.Message), massage);
+            Modal.Show<DisplayMessage>
+                ("Alert", parameters);
+            return false;
+        }
+    }
+
+    public void Dispose() => allState.Action -= StateHasChanged;
+}
