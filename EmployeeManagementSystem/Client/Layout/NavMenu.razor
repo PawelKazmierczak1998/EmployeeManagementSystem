@@ -121,6 +121,33 @@
                                     </div>
                                 </a>
                             </li>
+                            <li styl="list-style:none;">
+                                <hr />
+                            </li>
+                            <li style="list-style:none;" class="cursorStyle">
+                                <a class="nav-link p-2 " @onclick="OvertimeClicked">
+                                    <div class="hstack">
+                                        <span class="bi bi-stopwatch fs-5 text-center" aria-hidden="true" style="margin-top:-2rem"></span>
+                                        <span>Overtime</span>
+                                    </div>
+                                </a>
+                            </li>
+                            <li style="list-style:none;" class="cursorStyle">
+                                <a class="nav-link p-2 " @onclick="VactionClicked">
+                                    <div class="hstack">
+                                        <span class="bi bi-backpack3-fill fs-5 text-center" aria-hidden="true" style="margin-top:-2rem"></span>
+                                        <span>Vacation</span>
+                                    </div>
+                                </a>
+                            </li>
+                            <li style="list-style:none;" class="cursorStyle">
+                                <a class="nav-link p-2 " @onclick="SanctionClicked">
+                                    <div class="hstack">
+                                        <span class="bi bi-octagon fs-5 text-center" aria-hidden="true" style="margin-top:-2rem"></span>
+                                        <span>Sanction</span>
+                                    </div>
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -184,5 +211,9 @@
     void TownClicked() => allState.TownClicked();
     void EmployeeClicked() => allState.EmployeeClicked();
     void UserClicked() => allState.UserClicked();
+    void VactionClicked() => allState.VacationTypeClicked();
+    void OvertimeClicked() => allState.OvertimeTypeClicked();
+    void SanctionClicked() => allState.SanctionTypeClicked();
+
 
 }

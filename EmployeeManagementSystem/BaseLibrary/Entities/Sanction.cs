@@ -16,8 +16,10 @@ namespace BaseLibrary.Entities
         [Required]
         public DateTime PunishmentDate { get; set; }
 
-        // Relacaj Welu do 1 z VacationType
+        // Relacaj Welu do 1 z SanctionType
 
         public SanctionType? SanctionType { get; set; }
+        [Required]
+        public int SanctionTypeId { get; set; }
     }
 }

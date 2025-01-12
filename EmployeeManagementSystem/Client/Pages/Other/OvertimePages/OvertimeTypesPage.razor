@@ -1,0 +1,208 @@
+﻿@if (allState.ShowOvertimeType)
+{
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="float-start">Overtime Types</h4>
+                        <button class="btn btn-outline-success float-end" @onclick="AddOpenDialog"><i class="bi bi-plus-circle-doted"></i>Add  Overtime Type</button>
+                    </div>
+                    <div class="card-header" style="max-height:580px; overflow-x:hidden; overflow-y:scroll;">
+                        <div class="card-body">
+                            <table class="table table-striped ">
+                                <thead>
+                                    <tr>
+                                        <th scope="col"> #</th>
+                                        <th scope="col">Id</th>
+                                        <th scope="col">Type</th>
+                                        <th scope="col">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (OvertimeTypes.Count <= 0)
+                                    {
+                                        <tr>
+                                            <td colspan="5"><div class="alert alert-info text-center">No Overtime Types added yet!</div></td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+
+                                        int count = 1;
+                                        foreach (var item in OvertimeTypes)
+                                        {
+                                            <tr>
+                                                <th>@count</th>
+                                                <td>@item.Id</td>
+                                                <td>@item.Name</td>
+                                                <td>
+                                                    <i class="bi bi-pencil text-info" @onclick="()=>EditClicked(item)"></i>
+                                                    <i class="bi bi-trash text-danger" @onclick="()=>DeleteClicked(item)"></i>
+                                                </td>
+                                            </tr>
+                                            count++;
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [CascadingParameter] public IModalService Modal { get; set; } = default!;
+    public OvertimeType OvertimeType { get; set; } = new();
+    public List<OvertimeType> OvertimeTypes { get; set; } = new();
+    public string Title { get; set; } = "Add";
+
+    protected async override void OnInitialized()
+    {
+        await GetOvertimeTypes();
+        allState.Action += StateHasChanged;
+    }
+    private async Task GetOvertimeTypes()
+    {
+        OvertimeTypes = await overtimeTypeService.GetAll(Constants.OvertimeTypeBaseUrl);
+    }
+
+    async Task AddOpenDialog()
+    {
+        Title = "Add";
+        OvertimeType = new();
+        await OpenDialog();
+    }
+    async Task OpenDialog()
+    {
+
+        if (Title == "Update")
+        {
+            var parameters = new ModalParameters()
+        .Add(nameof(OvertimeTypesDialog.OvertimeType), OvertimeType);
+
+
+            var form = Modal.Show<DepartmentDialog>($"{Title} Overtime Type", parameters);
+            var result = await form.Result;
+
+            if (result.Confirmed)
+            {
+                var temp = result.Data.ToString().Split(';');
+              
+
+                if (temp.Length == 2)
+                {
+                    OvertimeType.Name = temp[0];
+
+
+                    await HandleSaveOperationEvent(OvertimeType);
+
+
+                }
+
+            }
+        }
+        else
+        {
+            var form = Modal.Show<DepartmentDialog>($"{Title}  Overtime Type");
+            var result = await form.Result;
+
+            if (result.Confirmed)
+            {
+                var temp = result.Data.ToString().Split(';');
+               
+
+                if (temp.Length == 2)
+                {
+                    OvertimeType.Name = temp[0];
+                  
+
+                    await HandleSaveOperationEvent(OvertimeType);
+
+    
+
+                }
+
+            }
+        }
+    }
+
+    private async Task HandleSaveOperationEvent(OvertimeType overtimeType)
+    {
+        bool successCheck = false;
+        if (overtimeType.Id > 0)
+        {
+            var result = await overtimeTypeService
+            .Update(overtimeType, Constants.OvertimeTypeBaseUrl);
+            successCheck = await DisplayMassage(result.Flag, result.Massage);
+
+        }
+        else
+        {
+            var response = await overtimeTypeService
+            .Insert(overtimeType, Constants.OvertimeTypeBaseUrl);
+            successCheck = await DisplayMassage(response.Flag, response.Massage);
+
+        }
+        if (successCheck)
+        {
+            OvertimeType = new();
+            await GetOvertimeTypes();
+            Title = "Add";
+            StateHasChanged();
+        }
+    }
+    private async void EditClicked(OvertimeType dep)
+    {
+        Title = "Update";
+        OvertimeType = dep;
+        await GetOvertimeTypes();
+        await OpenDialog();
+
+    }
+
+    private async void DeleteClicked(OvertimeType dep)
+    {
+        var confirmModal = Modal.Show<ConfirmationDialog>($"Are you sure you wanna delete {dep.Name}?");
+        var result = await confirmModal.Result;
+
+        if (result.Cancelled) return;
+
+        var response = await overtimeTypeService.DeleteById(dep.Id, Constants.OvertimeTypeBaseUrl);
+        if (await DisplayMassage(response.Flag, response.Massage))
+        {
+            await GetOvertimeTypes();
+            StateHasChanged();
+        }
+    }
+
+
+    private async Task<bool> DisplayMassage(bool flag, string massage)
+    {
+
+        if (flag)
+        {
+            var parameters = new ModalParameters()
+        .Add(nameof(DisplayMessage.Message), massage);
+            Modal.Show<DisplayMessage>("Succes", parameters);
+            return true;
+        }
+        else
+        {
+            var parameters = new ModalParameters()
+        .Add(nameof(DisplayMessage.Message), massage);
+            Modal.Show<DisplayMessage>("Alert", parameters);
+            return false;
+        }
+    }
+
+    public void Dispose()
+    {
+        allState.Action -= StateHasChanged;
+    }
+
+}

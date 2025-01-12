@@ -22,6 +22,10 @@
 @using Blazored.Modal.Services
 @using Client.Pages.UserPages
 @using Client.Pages.EmployeePages
+@using Client.Pages.Other.DoctorPages
+@using Client.Pages.Other.OvertimePages
+@using Client.Pages.Other.SanctionsPages
+@using Client.Pages.Other.VacationPages
 
 
 @inject AuthenticationStateProvider AuthStateProvider
@@ -46,3 +50,15 @@
 
 @* /Employee*@
 @inject IGenericServiceInterface<Employee> employeeService
+
+@* /Overtime /vacation /sanction /doctor *@
+@inject IGenericServiceInterface<Overtime> overtimeService
+@inject IGenericServiceInterface<OvertimeType> overtimeTypeService
+
+@inject IGenericServiceInterface<Vacation> vacationService
+@inject IGenericServiceInterface<VacationType> vacationTypeService
+
+@inject IGenericServiceInterface<Sanction> sanctionService
+@inject IGenericServiceInterface<SanctionType> sanctionTypeService
+
+@inject IGenericServiceInterface<Doctor> doctorService

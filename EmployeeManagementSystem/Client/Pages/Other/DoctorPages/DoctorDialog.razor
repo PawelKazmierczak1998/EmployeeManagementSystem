@@ -1,0 +1,81 @@
+﻿@using BaseLibrary.Entities
+@using System.ComponentModel.DataAnnotations
+
+
+<div class="card border-success">
+    <EditForm Model="Doctor" OnValidSubmit="Save">
+        <div class="card-body">
+            <div class="form-group">
+                <label for="form-label">Employee Id:</label>
+                <InputNumber @bind-Value="Doctor.EmployeeId" class="form-control" disabled />
+            </div>
+            <div class="form-group mt-2">
+                <label for="form-label">Date:</label>
+                <InputDate @bind-Value="Doctor.Date" class="form-control" />
+            </div>
+            <div class="form-group mt2">
+                <label for="form-label">Medical Diagnose :</label>
+                <InputText @bind-Value="Doctor.MedicalDiagnose" class="form-control" />
+            </div>
+            <div class="form-group mt2">
+                <label for="form-label">Medical Recommendation :</label>
+                <InputText @bind-Value="Doctor.MedicalRecommendation" class="form-control" />
+            </div>
+        </div>
+        <div class="card-footer text-center">
+            <div class="mx-auto">
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <button @onclick="Cancel" class="btn btn-secondary">Cancel</button>
+            </div>
+
+        </div>
+
+        <DataAnnotationsValidator />
+    </EditForm>
+</div>
+
+@code {
+
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+    [Parameter] public int i { get; set; }
+    [Parameter] public Doctor Doctor { get; set; } = new();
+    [Parameter] public Employee Employee { get; set; } = new();
+
+    [Parameter] public EventCallback<Doctor> HandleSaveOperationEvent { get; set; }
+
+
+    protected override async void OnInitialized()
+    {
+        Doctor.Date = DateTime.Now;
+        Doctor.EmployeeId =i;
+
+        allState.Action += StateHasChanged;
+        StateHasChanged();
+    }
+   
+
+    async Task Save()
+    {
+        var returnData = $"{Doctor.Date};{Doctor.MedicalDiagnose};{Doctor.MedicalRecommendation};{Doctor.EmployeeId}";
+
+        if (string.IsNullOrEmpty(Doctor.MedicalDiagnose))
+        {
+
+        }
+        else
+        {
+
+
+            await HandleSaveOperationEvent.InvokeAsync(Doctor);
+            await BlazoredModal.CloseAsync(ModalResult.Ok(returnData));
+        }
+
+    }
+
+
+
+    async Task Cancel() => await BlazoredModal.CancelAsync();
+
+
+}
+

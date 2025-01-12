@@ -78,7 +78,7 @@ namespace ServerLibrary.Repositories.Implementations
             return Success();
         }
 
-        private static GeneralResponse NotFound() => new(false, "Sorry branch not found");
+        private static GeneralResponse NotFound() => new(false, "Sorry employee not found");
         private static GeneralResponse Success() => new(true, "Process completed");
 
         private async Task Commit() => await appDbContext.SaveChangesAsync();

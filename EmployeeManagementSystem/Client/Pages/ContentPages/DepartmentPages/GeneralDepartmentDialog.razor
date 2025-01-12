@@ -6,7 +6,7 @@
     <EditForm Model="GeneralDepartment" OnValidSubmit="Save">
         <div class="card-body">
             <div class="form-group">
-                <label for="message">Name:</label>
+                <label for="name">Name:</label>
                 <InputText @bind-Value="GeneralDepartment.Name" class="form-control" placeholder="Enter a name" />
                 <ValidationMessage For="@(() => GeneralDepartment.Name)" />
             </div>
