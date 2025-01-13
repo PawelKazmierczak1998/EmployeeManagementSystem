@@ -73,9 +73,11 @@
 
 
         await HandleSaveOperationEvent.InvokeAsync(Sanction);
+
         await BlazoredModal.CloseAsync(ModalResult.Ok(returnData));
 
 
+        StateHasChanged();
     }
 
     public void OnValueChangeOvertimeTypes(ChangeEventArgs args)

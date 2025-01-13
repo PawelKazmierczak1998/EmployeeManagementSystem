@@ -9,6 +9,8 @@
 
                     </div>
                     <div class="card-body">
+                        @if (Doctors.Count != 0)
+                        {
                         <QuickGrid Items="Doctors.AsQueryable()">
                             <PropertyColumn Title="Employee Id" Property="e=>e.EmployeeId" />
                             <PropertyColumn Title="Date" Property="e=>e.Date" />
@@ -25,6 +27,11 @@
                                 }
                             </TemplateColumn>
                         </QuickGrid>
+                        }
+                        else
+                        {
+                            <span> To add doctor note go to employee page  </span>
+                        }
                     </div>
                     <div class="card-footer"></div>
                 </div>

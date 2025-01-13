@@ -60,7 +60,7 @@ namespace ServerLibrary.Repositories.Implementations
         public async Task<GeneralResponse> Update(Employee employee)
         {
             var findUser = await appDbContext.Employees.FirstOrDefaultAsync(e => e.Id == employee.Id);
-            if (findUser is null) return new GeneralResponse(false,"Employee does not exist");
+            if (findUser is null) return new GeneralResponse(false, "Employee does not exist");
 
             findUser.Name = employee.Name;
             findUser.Other = employee.Other;
@@ -78,7 +78,7 @@ namespace ServerLibrary.Repositories.Implementations
             return Success();
         }
 
-        private static GeneralResponse NotFound() => new(false, "Sorry employee not found");
+        private static GeneralResponse NotFound() => new(false, "Sorry branch not found");
         private static GeneralResponse Success() => new(true, "Process completed");
 
         private async Task Commit() => await appDbContext.SaveChangesAsync();

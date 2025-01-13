@@ -16,7 +16,7 @@ namespace BaseLibrary.Entities
         [Required, DataType(DataType.PhoneNumber)]
         public string TelephoneNumber { get; set; }
         [Required]
-        public string Photo {  get; set; } =string.Empty;
+        public string Photo { get; set; } = string.Empty;
         public string? Other { get; set; }
 
         //Relacje Wielu do jednego z Branch

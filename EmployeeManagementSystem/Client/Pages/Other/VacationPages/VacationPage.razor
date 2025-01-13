@@ -9,12 +9,14 @@
                         <button class="btn btn-outline-success float-end" @onclick="VacationTypeButtonClicked"><i class="bi bi-plus-circle-doted"></i>Vacation Type</button>
                     </div>
                     <div class="card-body">
+                        @if (Vacations.Count !=0)
+                        {
                         <QuickGrid Items="Vacations.AsQueryable()">
                             <PropertyColumn Title="Employee Id" Property="e=>e.EmployeeId" />
                             <PropertyColumn Title="Start Date" Property="e=>e.StartDate" />
                             <PropertyColumn Title="End Date" Property="e=>e.EndDate" />
                             <PropertyColumn Title="Number Of Days" Property="e=>e.NumberOfDays" />
-                            <PropertyColumn Title="Type" Property="e=>e.VacationType.Name" />
+                            <PropertyColumn Title="Type" Property="e=>e.VacationType!.Name" />
                             <TemplateColumn Title="Action">
                                 @{
                                     var vacation = (context as Vacation);
@@ -26,6 +28,11 @@
                                 }
                             </TemplateColumn>
                         </QuickGrid>
+                        }
+                        else
+                        {
+                            <span> To add vacation go to employee page  </span>
+                        }
                     </div>
                     <div class="card-footer"></div>
                 </div>
@@ -56,6 +63,7 @@
     {
         allState.VacationTypeClicked();
     }
+
     public async void DeleteButtonClicked(Vacation vacation)
     {
         var confirmModal = Modal.Show<ConfirmationDialog>($"Are you sure you wanna delete {vacation.EmployeeId}?");
@@ -63,7 +71,7 @@
 
         if (result.Cancelled) return;
 
-        var response = await vacationService.DeleteById(vacation.Id, Constants.VacationBaseUrl);
+        var response = await vacationService.DeleteById(vacation.EmployeeId, Constants.VacationBaseUrl);
         if (await DisplayMassage(response.Flag, response.Massage))
         {
             await GetSanctions();

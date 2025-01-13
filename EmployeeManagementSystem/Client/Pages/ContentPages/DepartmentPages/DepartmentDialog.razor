@@ -19,7 +19,7 @@
                 <label for="form-label">Select General Department:</label>
                 @if(Department.GeneralDepartment != null)
                 {
-                    string slected = Department.GeneralDepartment!.Name;
+                    string slected = Department.GeneralDepartment!.Name!;
                     <select id="GeneralDepartments" @onchange="OnValueChange" >
                         <option value="0">@slected</option>
                         @foreach (var item in GeneralDepartments)

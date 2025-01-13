@@ -9,24 +9,30 @@
                         <button class="btn btn-outline-success float-end" @onclick="SanctionTypeButtonClicked"><i class="bi bi-plus-circle-doted"></i>Sanction Type</button>
                     </div>
                     <div class="card-body">
-                        <QuickGrid Items="Sanctions.AsQueryable()">
-                            <PropertyColumn Title="Employee Id" Property="e=>e.EmployeeId" />
-                            <PropertyColumn Title="Start Date" Property="e=>e.Date" />
-                            <PropertyColumn Title="Expiry Date" Property="e=>e.PunishmentDate" />
-                            <PropertyColumn Title="Punishment Note" Property="e=>e.Punishment" />
-                            <PropertyColumn Title="Type" Property="e=>e.SanctionType.Name" />
-                            <TemplateColumn Title="Action">
-                                @{
-                                    var sanction = (context as Sanction);
-                                    <div>
-                                        <i class="bi bi-pencil text-info" @onclick="()=>EditButtonClicked(sanction)"></i>
-                                        <i class="bi bi-trash text-danger" @onclick="()=>DeleteButtonClicked(sanction)"></i>
-                                       
-                                    </div>
+                        @if(Sanctions.Count !=0)
+                        {
+                            <QuickGrid Items="Sanctions.AsQueryable()">
+                                <PropertyColumn Title="Employee Id" Property="e=>e.EmployeeId" />
+                                <PropertyColumn Title="Start Date" Property="e=>e.Date" />
+                                <PropertyColumn Title="Expiry Date" Property="e=>e.PunishmentDate" />
+                                <PropertyColumn Title="Punishment Note" Property="e=>e.Punishment" />
+                                <PropertyColumn Title="Type" Property="e=>e.SanctionType.Name" />
+                                <TemplateColumn Title="Action">
+                                    @{
+                                        var sanction = (context as Sanction);
+                                        <div>
+                                            <i class="bi bi-pencil text-info" @onclick="()=>EditButtonClicked(sanction)"></i>
+                                            <i class="bi bi-trash text-danger" @onclick="()=>DeleteButtonClicked(sanction)"></i>
 
-                                }
-                            </TemplateColumn>
-                        </QuickGrid>
+                                        </div>
+
+                                    }
+                                </TemplateColumn>
+                            </QuickGrid>
+                        }
+                        else{
+                            <span> To add sanction go to employee page  </span>
+                        }
                     </div>
                     <div class="card-footer"></div>
                 </div>
@@ -64,7 +70,7 @@
 
         if (result.Cancelled) return;
 
-        var response = await sanctionService.DeleteById(sanction.Id, Constants.SanctionBaseUrl);
+        var response = await sanctionService.DeleteById(sanction.EmployeeId, Constants.SanctionBaseUrl);
         if (await DisplayMassage(response.Flag, response.Massage))
         {
             await GetSanctions();

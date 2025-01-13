@@ -6,7 +6,7 @@
                 <div class="card">
                     <div class="card-header">
                         <h4 class="float-start">Sanction Types</h4>
-                        <button class="btn btn-outline-success float-end" @onclick="AddOpenDialog"><i class="bi bi-plus-circle-doted"></i>Add  Overtime Type</button>
+                        <button class="btn btn-outline-success float-end" @onclick="AddOpenDialog"><i class="bi bi-plus-circle-doted"></i>Add  Sanction Type</button>
                     </div>
                     <div class="card-header" style="max-height:580px; overflow-x:hidden; overflow-y:scroll;">
                         <div class="card-body">
@@ -86,7 +86,7 @@
         .Add(nameof(SanctionTypeDialog.SanctionType), SanctionType);
 
 
-            var form = Modal.Show<DepartmentDialog>($"{Title} Sanction Type", parameters);
+            var form = Modal.Show<SanctionTypeDialog>($"{Title} Sanction Type", parameters);
             var result = await form.Result;
 
             if (result.Confirmed)
@@ -94,21 +94,19 @@
                 var temp = result.Data.ToString().Split(';');
 
 
-                if (temp.Length == 2)
-                {
+              
                     SanctionType.Name = temp[0];
 
 
                     await HandleSaveOperationEvent(SanctionType);
 
 
-                }
 
             }
         }
         else
         {
-            var form = Modal.Show<DepartmentDialog>($"{Title}  Sanction Type");
+            var form = Modal.Show<SanctionTypeDialog>($"{Title}  Sanction Type");
             var result = await form.Result;
 
             if (result.Confirmed)
@@ -116,8 +114,7 @@
                 var temp = result.Data.ToString().Split(';');
 
 
-                if (temp.Length == 2)
-                {
+               
                     SanctionType.Name = temp[0];
 
 
@@ -125,7 +122,7 @@
 
 
 
-                }
+                
 
             }
         }

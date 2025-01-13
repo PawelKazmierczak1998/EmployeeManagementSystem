@@ -43,17 +43,11 @@
     {
         var returnData = $"{SanctionType.Name}";
 
-        if (string.IsNullOrEmpty(SanctionType.Name))
-        {
-
-        }
-        else
-        {
+        
 
 
             await HandleSaveOperationEvent.InvokeAsync(SanctionType);
             await BlazoredModal.CloseAsync(ModalResult.Ok(returnData));
-        }
 
     }
 
