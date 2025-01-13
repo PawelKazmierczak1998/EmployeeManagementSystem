@@ -85,7 +85,7 @@
         .Add(nameof(VacationTypeDialog.VacationType), VacationType);
 
 
-            var form = Modal.Show<DepartmentDialog>($"{Title} Overtime Type", parameters);
+            var form = Modal.Show<VacationTypeDialog>($"{Title} Vacation Type", parameters);
             var result = await form.Result;
 
             if (result.Confirmed)
@@ -107,7 +107,7 @@
         }
         else
         {
-            var form = Modal.Show<DepartmentDialog>($"{Title}  Vacation Type");
+            var form = Modal.Show<VacationTypeDialog>($"{Title}  Vacation Type");
             var result = await form.Result;
 
             if (result.Confirmed)

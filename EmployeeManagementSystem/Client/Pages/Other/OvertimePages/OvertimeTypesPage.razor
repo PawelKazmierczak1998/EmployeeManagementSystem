@@ -86,7 +86,7 @@
         .Add(nameof(OvertimeTypesDialog.OvertimeType), OvertimeType);
 
 
-            var form = Modal.Show<DepartmentDialog>($"{Title} Overtime Type", parameters);
+            var form = Modal.Show<OvertimeTypesDialog>($"{Title} Overtime Type", parameters);
             var result = await form.Result;
 
             if (result.Confirmed)
@@ -108,7 +108,7 @@
         }
         else
         {
-            var form = Modal.Show<DepartmentDialog>($"{Title}  Overtime Type");
+            var form = Modal.Show<OvertimeTypesDialog>($"{Title}  Overtime Type");
             var result = await form.Result;
 
             if (result.Confirmed)

@@ -9,6 +9,8 @@
                         <button class="btn btn-outline-success float-end" @onclick="OvertimeTypeButtonClicked"><i class="bi bi-plus-circle-doted"></i>Overtime Type</button>
                     </div>
                     <div class="card-body">
+                        @if (Overtimes.Count != 0)
+                        {
                         <QuickGrid Items="Overtimes.AsQueryable()">
                             <PropertyColumn Title="Employee Id" Property="e=>e.EmployeeId" />
                             <PropertyColumn Title="Start Date" Property="e=>e.StartDate" />
@@ -27,6 +29,11 @@
                                 }
                             </TemplateColumn>
                         </QuickGrid>
+                        }
+                        else
+                        {
+                            <span> To add overtime go to employee page  </span>
+                        }
                     </div>
                     <div class="card-footer"></div>
                 </div>
@@ -64,7 +71,7 @@
 
         if (result.Cancelled) return;
 
-        var response = await overtimeService.DeleteById(Overtime.Id, Constants.OvertimeBaseUrl);
+        var response = await overtimeService.DeleteById(overtime.EmployeeId, Constants.OvertimeBaseUrl);
         if (await DisplayMassage(response.Flag, response.Massage))
         {
             await GetOvertime();
