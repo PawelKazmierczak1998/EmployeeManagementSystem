@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace ServerLibrary.Data.Migrations
+namespace ServerLibrary.Migrations
 {
     /// <inheritdoc />
-    public partial class First : Migration
+    public partial class test : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -48,9 +48,7 @@ namespace ServerLibrary.Data.Migrations
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false),
                     MedicalDiagnose = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     MedicalRecommendation = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CivilId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    FileNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Other = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    EmployeeId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -199,9 +197,7 @@ namespace ServerLibrary.Data.Migrations
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     OvertimeTypeId = table.Column<int>(type: "int", nullable: false),
-                    CivilId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    FileNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Other = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    EmployeeId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -223,10 +219,8 @@ namespace ServerLibrary.Data.Migrations
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Punishment = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PunishmentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    SanctionTypeId = table.Column<int>(type: "int", nullable: true),
-                    CivilId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    FileNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Other = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    SanctionTypeId = table.Column<int>(type: "int", nullable: false),
+                    EmployeeId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -235,7 +229,8 @@ namespace ServerLibrary.Data.Migrations
                         name: "FK_Sanctions_SanctionTypes_SanctionTypeId",
                         column: x => x.SanctionTypeId,
                         principalTable: "SanctionTypes",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -247,9 +242,7 @@ namespace ServerLibrary.Data.Migrations
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     NumberOfDays = table.Column<int>(type: "int", nullable: false),
                     VacationTypeId = table.Column<int>(type: "int", nullable: false),
-                    CivilId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    FileNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Other = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    EmployeeId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -310,7 +303,6 @@ namespace ServerLibrary.Data.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CivilId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     FileNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     JobName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TelephoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),

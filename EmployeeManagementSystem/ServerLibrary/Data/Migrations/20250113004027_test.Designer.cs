@@ -9,11 +9,11 @@ using ServerLibrary.Data;
 
 #nullable disable
 
-namespace ServerLibrary.Data.Migrations
+namespace ServerLibrary.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250110143942_updateTables")]
-    partial class updateTables
+    [Migration("20250113004027_test")]
+    partial class test
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -312,7 +312,7 @@ namespace ServerLibrary.Data.Migrations
                     b.Property<DateTime>("PunishmentDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("SanctionTypeId")
+                    b.Property<int>("SanctionTypeId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -507,7 +507,9 @@ namespace ServerLibrary.Data.Migrations
                 {
                     b.HasOne("BaseLibrary.Entities.SanctionType", "SanctionType")
                         .WithMany("Sanctions")
-                        .HasForeignKey("SanctionTypeId");
+                        .HasForeignKey("SanctionTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("SanctionType");
                 });
