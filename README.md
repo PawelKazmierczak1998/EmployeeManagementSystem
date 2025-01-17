@@ -59,5 +59,5 @@ This project is a Employee Management System implemented using ASP.NET Core 8 fo
 - SQL Server
 - Nginx or Apache
 ### Data Base Migration and Update
-- add-migration [name] -o Data/Migration # Before starting, make sure you select the correct project in the package manager console [ServerLibrary] and select the correct startup item [Server].
+- add-migration [name] -o Data/Migration # Before starting, make sure you select the correct project in the package manager console [ServerLibrary] and select the correct startup item [Server].(Applies only in cases where the Data folder does not contain mgration)
 - update-database 
