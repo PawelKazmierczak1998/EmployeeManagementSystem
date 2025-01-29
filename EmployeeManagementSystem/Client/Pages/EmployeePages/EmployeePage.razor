@@ -83,7 +83,7 @@ Employee="Employee"
 ShowAddOrUpdateEmployee="ShowAddOrUpdatePage"
 NotifyPerentFormCloseClicked="NotifyPerentFormCloseClicked"
 Countries="DefaultCountries"
-Cities="DefaultCities"
+Counties="DefaultCounties"
 Towns="DefaultTowns"
 GeneralDepartmentents="DefaultGeneralDepartmentents"
 Departmentents="DefaultDepartmentents"
@@ -94,7 +94,7 @@ HandleGeneralDepartmentSelectionEvent="HandleGeneralDepartmentSelectionEvent"
 HandleDepartmententSelectionEvent="HandleDepartmententSelectionEvent"
 HandleSaveEmployeeClickedEvent="HandleSaveEmployeeClickedEvent" />
 
-<EmployeeDetailPage @ref="employeeDetailPage" Employee="Employee" ShowDetailsPage=" ShowDetailsPage" HandleDetailsPageClosedClicked="HandleDetailsPageClosedClicked" />
+<EmployeeDetailPage @ref="employeeDetailPage" Employee="Employee"  HandleDetailsPageClosedClicked="HandleDetailsPageClosedClicked" />
 @code {
     [CascadingParameter] public IModalService Modal { get; set; } = default!;
     AddOrUpdateEmployeePage? addOrUpdateEmployee;
@@ -104,7 +104,7 @@ HandleSaveEmployeeClickedEvent="HandleSaveEmployeeClickedEvent" />
     public Doctor Doctor { get; set; } = new();
     public string Title { get; set; } = "Add";
     public List<Country> DefaultCountries { get; set; } = [];
-    public List<City> DefaultCities { get; set; } = [];
+    public List<County> DefaultCounties { get; set; } = [];
     public List<Town> DefaultTowns { get; set; } = [];
 
     public List<GeneralDepartment> DefaultGeneralDepartmentents { get; set; } = [];
@@ -113,7 +113,7 @@ HandleSaveEmployeeClickedEvent="HandleSaveEmployeeClickedEvent" />
 
     public List<Department> SelectedDepartments { get; set; } = [];
     public List<Branch> SelectedBranches { get; set; } = [];
-    public List<City> SelectedCities { get; set; } = [];
+    public List<County> SelectedCounties { get; set; } = [];
     public List<Town> SelectedTowns { get; set; } = [];
 
     public List<OvertimeType> OvertimeTypes { get; set; } = [];
@@ -156,15 +156,15 @@ HandleSaveEmployeeClickedEvent="HandleSaveEmployeeClickedEvent" />
     private async Task LoadDefaults()
     {
         DefaultCountries = await countryService.GetAll(Constants.CountryBaseUrl);
-        DefaultCities = await cityService.GetAll(Constants.CityBaseUrl);
+        DefaultCounties = await countyService.GetAll(Constants.CountyBaseUrl);
         DefaultTowns = await townService.GetAll(Constants.TownBaseUrl);
         DefaultGeneralDepartmentents = await generalDepartmentService.GetAll(Constants.GeneralDepartmentBaseUrl);
         DefaultDepartmentents = await departmentService.GetAll(Constants.DepartmentBaseUrl);
         DefaultBranches = await branchService.GetAll(Constants.BranchBaseUrl);
     }
 
-    private void HandleCountrySelectionEvent(int countryId) => SelectedCities = DefaultCities.Where(c => c.CountryId == countryId).ToList();
-    private void HandleCitySelectionEvent(int cityId) => SelectedTowns = DefaultTowns.Where(c => c.CityId == cityId).ToList();
+    private void HandleCountrySelectionEvent(int countryId) => SelectedCounties = DefaultCounties.Where(c => c.CountryId == countryId).ToList();
+    private void HandleCitySelectionEvent(int countyId) => SelectedTowns = DefaultTowns.Where(c => c.CountyId == countyId).ToList();
     private void HandleGeneralDepartmentSelectionEvent(int generalDepartmentId) => SelectedDepartments = DefaultDepartmentents.Where(c => c.GeneralDepartmentId == generalDepartmentId).ToList();
     private void HandleDepartmententSelectionEvent(int departmentId) => SelectedBranches = DefaultBranches.Where(c => c.DepartmentId == departmentId).ToList();
 
@@ -191,7 +191,6 @@ HandleSaveEmployeeClickedEvent="HandleSaveEmployeeClickedEvent" />
 
     public bool ShowMainPage { get; set; } = true;
     public bool ShowAddOrUpdatePage { get; set; } = false;
-    public bool ShowDetailsPage { get; set; } = false;
     public void ShowAddOrUpdateEmployeeButtonClicked()
     {
         if (Title.Contains("Update"))
@@ -249,7 +248,7 @@ HandleSaveEmployeeClickedEvent="HandleSaveEmployeeClickedEvent" />
     {
         Employee = employee;
 
-        ShowDetailsPage = true;
+        allState.EmployeeDetailsPageClicked();
         ShowMainPage = false;
     }
 
@@ -295,7 +294,7 @@ HandleSaveEmployeeClickedEvent="HandleSaveEmployeeClickedEvent" />
             var temp = result.Data.ToString().Split(';');
             Overtime.EmployeeId = int.Parse(temp[3]);
             Overtime.StartDate = DateTime.Parse(temp[1]);
-            Overtime.EndDate = DateTime.Parse(temp[2]);
+            Overtime.NumberOfHours = int.Parse(temp[2]);
             Overtime.OvertimeTypeId = int.Parse(temp[4]);
             await SaveOvertimeEvent(Overtime);
         }
@@ -366,7 +365,7 @@ HandleSaveEmployeeClickedEvent="HandleSaveEmployeeClickedEvent" />
             Vacation.EmployeeId = int.Parse(temp[1]);
             Vacation.VacationTypeId = int.Parse(temp[2]);
             Vacation.NumberOfDays = int.Parse(temp[3]);
-            
+
             await SaveVacationEvent(Vacation);
         }
 
@@ -394,7 +393,7 @@ HandleSaveEmployeeClickedEvent="HandleSaveEmployeeClickedEvent" />
 
     void HandleDetailsPageClosedClicked()
     {
-        ShowDetailsPage = false;
+        allState.ShowDetailsPage = false;
         ShowMainPage = true;
     }
 

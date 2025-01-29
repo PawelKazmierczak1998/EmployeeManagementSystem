@@ -9,11 +9,11 @@ using ServerLibrary.Data;
 
 #nullable disable
 
-namespace ServerLibrary.Migrations
+namespace ServerLibrary.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250113004027_test")]
-    partial class test
+    [Migration("20250128201454_first")]
+    partial class first
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -69,7 +69,24 @@ namespace ServerLibrary.Migrations
                     b.ToTable("Branches");
                 });
 
-            modelBuilder.Entity("BaseLibrary.Entities.City", b =>
+            modelBuilder.Entity("BaseLibrary.Entities.Country", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Countries");
+                });
+
+            modelBuilder.Entity("BaseLibrary.Entities.County", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -88,24 +105,7 @@ namespace ServerLibrary.Migrations
 
                     b.HasIndex("CountryId");
 
-                    b.ToTable("Citys");
-                });
-
-            modelBuilder.Entity("BaseLibrary.Entities.Country", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Countrys");
+                    b.ToTable("Counties");
                 });
 
             modelBuilder.Entity("BaseLibrary.Entities.Department", b =>
@@ -239,8 +239,8 @@ namespace ServerLibrary.Migrations
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("NumberOfHours")
+                        .HasColumnType("int");
 
                     b.Property<int>("OvertimeTypeId")
                         .HasColumnType("int");
@@ -363,7 +363,7 @@ namespace ServerLibrary.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CityId")
+                    b.Property<int>("CountyId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -372,7 +372,7 @@ namespace ServerLibrary.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CityId");
+                    b.HasIndex("CountyId");
 
                     b.ToTable("Towns");
                 });
@@ -451,10 +451,10 @@ namespace ServerLibrary.Migrations
                     b.Navigation("Department");
                 });
 
-            modelBuilder.Entity("BaseLibrary.Entities.City", b =>
+            modelBuilder.Entity("BaseLibrary.Entities.County", b =>
                 {
                     b.HasOne("BaseLibrary.Entities.Country", "Country")
-                        .WithMany("Cities")
+                        .WithMany("Counties")
                         .HasForeignKey("CountryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -516,13 +516,13 @@ namespace ServerLibrary.Migrations
 
             modelBuilder.Entity("BaseLibrary.Entities.Town", b =>
                 {
-                    b.HasOne("BaseLibrary.Entities.City", "City")
+                    b.HasOne("BaseLibrary.Entities.County", "County")
                         .WithMany("Towns")
-                        .HasForeignKey("CityId")
+                        .HasForeignKey("CountyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("City");
+                    b.Navigation("County");
                 });
 
             modelBuilder.Entity("BaseLibrary.Entities.Vacation", b =>
@@ -541,14 +541,14 @@ namespace ServerLibrary.Migrations
                     b.Navigation("Employees");
                 });
 
-            modelBuilder.Entity("BaseLibrary.Entities.City", b =>
-                {
-                    b.Navigation("Towns");
-                });
-
             modelBuilder.Entity("BaseLibrary.Entities.Country", b =>
                 {
-                    b.Navigation("Cities");
+                    b.Navigation("Counties");
+                });
+
+            modelBuilder.Entity("BaseLibrary.Entities.County", b =>
+                {
+                    b.Navigation("Towns");
                 });
 
             modelBuilder.Entity("BaseLibrary.Entities.Department", b =>

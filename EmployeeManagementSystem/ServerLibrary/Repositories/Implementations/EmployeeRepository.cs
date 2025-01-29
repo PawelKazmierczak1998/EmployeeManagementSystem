@@ -24,7 +24,7 @@ namespace ServerLibrary.Repositories.Implementations
             var employees = await appDbContext.Employees
                 .AsNoTracking()
                 .Include(t => t.Town)
-                .ThenInclude(b => b.City)
+                .ThenInclude(b => b.County)
                 .ThenInclude(c => c.Country)
                 .Include(b => b.Branch)
                 .ThenInclude(d => d.Department)
@@ -38,7 +38,7 @@ namespace ServerLibrary.Repositories.Implementations
             var employee = await appDbContext.Employees
                .AsNoTracking()
                .Include(t => t.Town)
-               .ThenInclude(b => b.City)
+               .ThenInclude(b => b.County)
                .ThenInclude(c => c.Country)
                .Include(b => b.Branch)
                .ThenInclude(d => d.Department)

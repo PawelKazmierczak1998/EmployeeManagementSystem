@@ -1,4 +1,4 @@
-﻿@if (ShowDetailsPage)
+﻿@if (allState.ShowDetailsPage)
 {
     <div class="container border  border-dark mt-5 " style="border-radius:1%;">
         <div class="row">
@@ -55,11 +55,11 @@
                                 </tr>
                                 <tr>
                                     <td><h6 class="fw-bold">Country:</h6></td>
-                                    <td> @Employee.Town.City.Country.Name </td>
+                                    <td> @Employee.Town.County.Country.Name </td>
                                 </tr>
                                 <tr>
-                                    <td><h6 class="fw-bold">City:</h6></td>
-                                    <td> @Employee.Town.City.Name </td>
+                                    <td><h6 class="fw-bold">County:</h6></td>
+                                    <td> @Employee.Town.County.Name </td>
                                 </tr>
                                 <tr>
                                     <td><h6 class="fw-bold">Town:</h6></td>

@@ -25,7 +25,7 @@ namespace ServerLibrary.Repositories.Implementations
 
         public async Task<List<Town>> GetAll() => await appDbContext.Towns
             .AsNoTracking()
-            .Include(c=>c.City)
+            .Include(c=>c.County)
             .ToListAsync();
 
 
@@ -44,7 +44,7 @@ namespace ServerLibrary.Repositories.Implementations
             var town = await appDbContext.Towns.FindAsync(item.Id);
             if (town is null) return NotFound();
             town.Name = item.Name;
-            town.CityId = item.CityId;
+            town.CountyId = item.CountyId;
             await Commit();
             return Success();
         }

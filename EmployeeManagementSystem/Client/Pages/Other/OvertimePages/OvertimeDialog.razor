@@ -14,11 +14,11 @@
                 <InputDate @bind-Value="Overtime.StartDate" class="form-control" />
             </div>
             <div class="form-group mt2">
-                <label for="form-label">End Date :</label>
-                <InputDate @bind-Value="Overtime.EndDate" class="form-control" />
+                <label for="form-label">Number Of Hours :</label>
+                <InputNumber @bind-Value="Overtime.NumberOfHours" class="form-control" />
             </div>
             <div class="form-group mt2">
-
+                <label for="form-label">Type :</label>
                 <select id="OvertimeTypes" @onchange="OnValueChangeOvertimeTypes">
                     <option value="0">-- Select a Overtime Type --</option>
                     @foreach (var item in OvertimeTypes)
@@ -54,6 +54,7 @@
     protected override async void OnInitialized()
     {
         OvertimeTypes = await overtimeTypeService.GetAll(Constants.OvertimeTypeBaseUrl);
+        Overtime.StartDate = DateTime.Now;
         Overtime.EmployeeId = i;
         allState.Action += StateHasChanged;
         StateHasChanged();
@@ -62,7 +63,7 @@
 
     async Task Save()
     {
-        var returnData = $"{Overtime.Id};{Overtime.StartDate};{Overtime.EndDate};{Overtime.EmployeeId};{Overtime.OvertimeTypeId};";
+        var returnData = $"{Overtime.Id};{Overtime.StartDate};{Overtime.NumberOfHours};{Overtime.EmployeeId};{Overtime.OvertimeTypeId};";
 
 
 

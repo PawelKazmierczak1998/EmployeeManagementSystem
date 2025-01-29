@@ -3,26 +3,26 @@
 
 
 <div class="card border-success">
-    <EditForm Model="City" OnValidSubmit="Save">
+    <EditForm Model="County" OnValidSubmit="Save">
         <div class="card-body">
             <div class="form-group">
                 <label for="form-label">Id:</label>
-                <input @bind="City.Id" class="form-control" disabled />
-                <ValidationMessage For="@(() => City.Id)" />
+                <input @bind="County.Id" class="form-control" disabled />
+                <ValidationMessage For="@(() => County.Id)" />
             </div>
             <div class="form-group">
                 <label for="form-label">Name:</label>
-                <InputText @bind-Value="City.Name" class="form-control" />
-                <ValidationMessage For="@(() => City.Name)" />
+                <InputText @bind-Value="County.Name" class="form-control" />
+                <ValidationMessage For="@(() => County.Name)" />
             </div>
             <div class="form-group mt-3 mb-3">
                 <label for="form-label">Select Country:</label>
-                @if (City.Country != null)
+                @if (County.Country != null)
                 {
-                    string slected = City.Country!.Name;
-                    <select id="Countryes" @onchange="OnValueChange">
+                    string slected = County.Country!.Name;
+                    <select id="Countries" @onchange="OnValueChange">
                         <option value="0">@slected</option>
-                        @foreach (var item in Countryes)
+                        @foreach (var item in Countries)
                         {
                             <option value="@item.Id">@item.Name</option>
                         }
@@ -30,9 +30,9 @@
                 }
                 else
                 {
-                    <select id="Countryes" @onchange="OnValueChange">
-                        <option value="0">-- Select a Department --</option>
-                        @foreach (var item in Countryes)
+                    <select id="Countries" @onchange="OnValueChange">
+                        <option value="0">-- Select a Country  --</option>
+                        @foreach (var item in Countries)
                         {
                             <option value="@item.Id">@item.Name</option>
                         }
@@ -57,26 +57,27 @@
 
     [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
 
-    [Parameter] public City City { get; set; } = new();
+    [Parameter] public County County { get; set; } = new();
 
-    [Parameter] public List<Country> Countryes { get; set; } = new();
+    [Parameter] public List<Country> Countries { get; set; } = new();
 
-    [Parameter] public EventCallback<City> HandleSaveOperationEvent { get; set; }
+    [Parameter] public EventCallback<County> HandleSaveOperationEvent { get; set; }
 
 
     [Parameter] public string Title { get; set; } = "Add";
     protected override async void OnInitialized()
     {
-        Countryes = await countryService.GetAll(Constants.CountryBaseUrl);
+        Countries = await countryService.GetAll(Constants.CountryBaseUrl);
         StateHasChanged();
     }
 
 
     async Task Save()
     {
-        var returnData = $"{City.Name};{City.CountryId.ToString()}";
+        //var returnData = $"{County.Name};{County.CountryId.ToString()}";
+        var returnData = $"{County.Name};{County.CountryId.ToString()}";
 
-        if (string.IsNullOrEmpty(City.Name) || City.CountryId <= 0)
+        if (string.IsNullOrEmpty(County.Name) || County.CountryId <= 0)
         {
 
         }
@@ -84,7 +85,7 @@
         {
 
 
-            await HandleSaveOperationEvent.InvokeAsync(City);
+            await HandleSaveOperationEvent.InvokeAsync(County);
             await BlazoredModal.CloseAsync(ModalResult.Ok(returnData));
         }
 
@@ -94,7 +95,7 @@
     {
         if (int.TryParse(args.Value?.ToString(), out int CountryId))
         {
-            City.CountryId = CountryId;
+            County.CountryId = CountryId;
         }
     }
 

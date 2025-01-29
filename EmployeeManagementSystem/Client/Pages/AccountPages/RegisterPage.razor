@@ -64,30 +64,33 @@
     public bool ShowLoadingButton { get; set; } = false;
     Register User = new();
 
-    // [CascadingParameter] public Task<AuthenticationState> AuthenticationState { get; set; }
-    // protected async override Task OnInitializedAsync()
-    // {
-    //     await CheckUserAuthentication();
-    // }
-
     async Task HandleRegistration()
     {
         ShowLoadingButton = true;
-        var result = await accountService.CreateAsync(User);
-        if (result.Flag)
-        {
-           
-            User = new();
-            if (await DisplayMassage(result.Flag, result.Massage))
+        try{
+            var result = await accountService.CreateAsync(User);
+            if (result.Flag)
             {
-                NavManager.NavigateTo("/identity/account/login");
+
+                User = new();
+                if (await DisplayMassage(result.Flag, result.Massage))
+                {
+                    NavManager.NavigateTo("/identity/account/login");
+                }
             }
+            else
+            {
+                await DisplayMassage(result.Flag, result.Massage);
+            }
+            ShowLoadingButton = false;
         }
-        else
+        catch (Exception ex)
         {
-            await DisplayMassage(result.Flag, result.Massage);
+            await DisplayMassage(false, $"Can not open connection ! Error: {ex.Message}");
+            ShowLoadingButton = false;
+            await Task.Delay(3000);
+            NavManager.NavigateTo("/identity/account/login", forceLoad: true);
         }
-        ShowLoadingButton = false;
     }
 
     private async Task<bool> DisplayMassage(bool flag, string massage)

@@ -11,53 +11,53 @@ using System.Threading.Tasks;
 
 namespace ServerLibrary.Repositories.Implementations
 {
-    public class CityRepository(AppDbContext appDbContext) : IGenericRepository<City>
+    public class CountyRepository(AppDbContext appDbContext) : IGenericRepository<County>
     {
         public async Task<GeneralResponse> DeleteById(int id)
         {
-            var dep = await appDbContext.Citys.FindAsync(id);
+            var dep = await appDbContext.Counties.FindAsync(id);
             if (dep is null) return NotFound();
 
-            appDbContext.Citys.Remove(dep);
+            appDbContext.Counties.Remove(dep);
             await Commit();
             return Success();
         }
 
-        public async Task<List<City>> GetAll() => await appDbContext.Citys
+        public async Task<List<County>> GetAll() => await appDbContext.Counties
             .AsNoTracking()
             .Include(ci=>ci.Country)
             .ToListAsync();
 
 
-        public async Task<City> GetById(int id) => await appDbContext.Citys.FindAsync(id);
+        public async Task<County> GetById(int id) => await appDbContext.Counties.FindAsync(id);
 
-        public async Task<GeneralResponse> Insert(City item)
+        public async Task<GeneralResponse> Insert(County item)
         {
-            if (!await CheckName(item.Name!)) return new GeneralResponse(false, "City already exist");
-            appDbContext.Citys.Add(item);
+            if (!await CheckName(item.Name!)) return new GeneralResponse(false, "County already exist");
+            appDbContext.Counties.Add(item);
             await Commit();
             return Success();
         }
 
-        public async Task<GeneralResponse> Update(City item)
+        public async Task<GeneralResponse> Update(County item)
         {
-            var city = await appDbContext.Citys.FindAsync(item.Id);
-            if (city is null) return NotFound();
-            city.Name = item.Name;
-            city.CountryId = item.CountryId;
+            var county = await appDbContext.Counties.FindAsync(item.Id);
+            if (county is null) return NotFound();
+            county.Name = item.Name;
+            county.CountryId = item.CountryId;
 
             await Commit();
             return Success();
         }
 
-        private static GeneralResponse NotFound() => new(false, "Sorry city not found");
+        private static GeneralResponse NotFound() => new(false, "Sorry county not found");
         private static GeneralResponse Success() => new(true, "Process completed");
 
         private async Task Commit() => await appDbContext.SaveChangesAsync();
 
         private async Task<bool> CheckName(string name)
         {
-            var item = await appDbContext.Citys.FirstOrDefaultAsync(x => x.Name!.ToLower().Equals(name.ToLower()));
+            var item = await appDbContext.Counties.FirstOrDefaultAsync(x => x.Name!.ToLower().Equals(name.ToLower()));
             return item is null;
         }
 

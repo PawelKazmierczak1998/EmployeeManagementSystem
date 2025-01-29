@@ -10,9 +10,9 @@ namespace BaseLibrary.Entities
         [JsonIgnore]
         public List<Employee>? Employees { get; set; }
 
-        //Relacja wielu do 1 z City
-        public City? City { get; set; }
-        public int CityId { get; set; }
+        //Relacja wielu do 1 z County
+        public County? County { get; set; }
+        public int CountyId { get; set; }
 
     }
 }

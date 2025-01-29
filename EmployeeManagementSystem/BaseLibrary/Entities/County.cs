@@ -2,7 +2,7 @@
 
 namespace BaseLibrary.Entities
 {
-    public class City : BaseEntity
+    public class County : BaseEntity
     {
         //Relacja wielu do 1 z Country
         public Country? Country { get; set; }

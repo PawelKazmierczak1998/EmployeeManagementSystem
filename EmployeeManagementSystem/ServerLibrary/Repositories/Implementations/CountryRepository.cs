@@ -10,30 +10,30 @@ namespace ServerLibrary.Repositories.Implementations
     {
         public async Task<GeneralResponse> DeleteById(int id)
         {
-            var dep = await appDbContext.Countrys.FindAsync(id);
+            var dep = await appDbContext.Countries.FindAsync(id);
             if (dep is null) return NotFound();
 
-            appDbContext.Countrys.Remove(dep);
+            appDbContext.Countries.Remove(dep);
             await Commit();
             return Success();
         }
 
-        public async Task<List<Country>> GetAll() => await appDbContext.Countrys.ToListAsync();
+        public async Task<List<Country>> GetAll() => await appDbContext.Countries.ToListAsync();
 
 
-        public async Task<Country> GetById(int id) => await appDbContext.Countrys.FindAsync(id);
+        public async Task<Country> GetById(int id) => await appDbContext.Countries.FindAsync(id);
 
         public async Task<GeneralResponse> Insert(Country item)
         {
             if (!await CheckName(item.Name!)) return new GeneralResponse(false, "Country already exist");
-            appDbContext.Countrys.Add(item);
+            appDbContext.Countries.Add(item);
             await Commit();
             return Success();
         }
 
         public async Task<GeneralResponse> Update(Country item)
         {
-            var country = await appDbContext.Countrys.FindAsync(item.Id);
+            var country = await appDbContext.Countries.FindAsync(item.Id);
             if (country is null) return NotFound();
             country.Name = item.Name;
             await Commit();
@@ -47,7 +47,7 @@ namespace ServerLibrary.Repositories.Implementations
 
         private async Task<bool> CheckName(string name)
         {
-            var item = await appDbContext.Countrys.FirstOrDefaultAsync(x => x.Name!.ToLower().Equals(name.ToLower()));
+            var item = await appDbContext.Countries.FirstOrDefaultAsync(x => x.Name!.ToLower().Equals(name.ToLower()));
             return item is null;
         }
 

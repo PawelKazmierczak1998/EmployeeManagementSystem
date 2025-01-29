@@ -47,7 +47,7 @@ namespace ServerLibrary.Repositories.Implementations
            var obj = await appDbContext.Overtimes.FirstOrDefaultAsync(eid=>eid.EmployeeId == item.EmployeeId);
             if(obj is null) return NotFound();
             obj.StartDate = item.StartDate;
-            obj.EndDate = item.EndDate;
+            obj.NumberOfHours = item.NumberOfHours;
             obj.OvertimeTypeId = item.OvertimeTypeId;
             await Commit();
             return Success();

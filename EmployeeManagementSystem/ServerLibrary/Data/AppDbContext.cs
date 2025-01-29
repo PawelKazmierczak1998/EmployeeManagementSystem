@@ -15,9 +15,9 @@ namespace ServerLibrary.Data
         public DbSet<Department> Departments { get; set; }
         public DbSet<Branch> Branches { get; set; }
 
-        // Country/ City / Town 
-        public DbSet<Country> Countrys { get; set; }
-        public DbSet<City> Citys { get; set; }
+        // Country/ County / Town 
+        public DbSet<Country> Countries { get; set; }
+        public DbSet<County> Counties { get; set; }
         public DbSet<Town> Towns { get; set; }
 
         // Authentication / Role / System Role

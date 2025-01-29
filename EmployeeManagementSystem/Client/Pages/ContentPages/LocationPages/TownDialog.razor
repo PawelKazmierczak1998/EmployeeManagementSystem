@@ -16,13 +16,13 @@
                 <ValidationMessage For="@(() => Town.Name)" />
             </div>
             <div class="form-group mt-3 mb-3">
-                <label for="form-label">Select City:</label>
-                @if (Town.City != null)
+                <label for="form-label">Select County:</label>
+                @if (Town.County != null)
                 {
-                    string slected = Town.City!.Name;
-                    <select id="Cityes" @onchange="OnValueChange">
+                    string slected = Town.County!.Name;
+                    <select id="Counties" @onchange="OnValueChange">
                         <option value="0">@slected</option>
-                        @foreach (var item in Cityes)
+                        @foreach (var item in Counties)
                         {
                             <option value="@item.Id">@item.Name</option>
                         }
@@ -30,9 +30,9 @@
                 }
                 else
                 {
-                    <select id="Countryes" @onchange="OnValueChange">
-                        <option value="0">-- Select a Department --</option>
-                        @foreach (var item in Cityes)
+                    <select id="Counties" @onchange="OnValueChange">
+                        <option value="0">-- Select a County --</option>
+                        @foreach (var item in Counties)
                         {
                             <option value="@item.Id">@item.Name</option>
                         }
@@ -59,7 +59,7 @@
 
     [Parameter] public Town Town { get; set; } = new();
 
-    [Parameter] public List<City> Cityes { get; set; } = new();
+    [Parameter] public List<County> Counties { get; set; } = new();
 
     [Parameter] public EventCallback<Town> HandleSaveOperationEvent { get; set; }
 
@@ -67,16 +67,16 @@
     [Parameter] public string Title { get; set; } = "Add";
     protected override async void OnInitialized()
     {
-        Cityes = await cityService.GetAll(Constants.CityBaseUrl);
+        Counties = await countyService.GetAll(Constants.CountyBaseUrl);
         StateHasChanged();
     }
 
 
     async Task Save()
     {
-        var returnData = $"{Town.Name};{Town.CityId.ToString()}";
+        var returnData = $"{Town.Name};{Town.CountyId.ToString()}";
 
-        if (string.IsNullOrEmpty(Town.Name) || Town.CityId <= 0)
+        if (string.IsNullOrEmpty(Town.Name) || Town.CountyId <= 0)
         {
 
         }
@@ -92,9 +92,9 @@
 
     public void OnValueChange(ChangeEventArgs args)
     {
-        if (int.TryParse(args.Value?.ToString(), out int CityId))
+        if (int.TryParse(args.Value?.ToString(), out int CountyId))
         {
-            Town.CityId = CityId;
+            Town.CountyId = CountyId;
         }
     }
 

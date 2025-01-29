@@ -14,11 +14,11 @@
                 <InputDate @bind-Value="Sanction.Date" class="form-control" />
             </div>
             <div class="form-group mt2">
-                <label for="form-label">PunishmentDate :</label>
+                <label for="form-label">Punishment Date :</label>
                 <InputDate @bind-Value="Sanction.PunishmentDate" class="form-control" />
             </div>         
             <div class="form-group mt2">
-
+                <label for="form-label">Type :</label>
                 <select id="SanctionTypes" @onchange="OnValueChangeOvertimeTypes">
                     <option value="0">-- Select a Sanction Type --</option>
                     @foreach (var item in SanctionTypes)
@@ -60,7 +60,7 @@
         SanctionTypes = await sanctionTypeService.GetAll(Constants.SanctionTypeBaseUrl);
         Sanction.EmployeeId = i;
         Sanction.Date = DateTime.Now;
-        Sanction.PunishmentDate = DateTime.Now.AddMonths(12);
+        Sanction.PunishmentDate = Sanction.Date.AddMonths(12);
         allState.Action += StateHasChanged;
         StateHasChanged();
     }

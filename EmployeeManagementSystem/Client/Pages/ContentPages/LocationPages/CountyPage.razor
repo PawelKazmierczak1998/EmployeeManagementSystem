@@ -2,15 +2,15 @@
 
 
 
-@if (allState.ShowCity)
+@if (allState.ShowCounty)
 {
     <div class="container mt-5">
         <div class="row">
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="float-start">City</h4>
-                        <button class="btn btn-outline-success float-end" @onclick="AddOpenDialog"><i class="bi bi-plus-circle-doted"></i>Add Department</button>
+                        <h4 class="float-start">County</h4>
+                        <button class="btn btn-outline-success float-end" @onclick="AddOpenDialog"><i class="bi bi-plus-circle-doted"></i>Add County</button>
                     </div>
                     <div class="card-header" style="max-height:580px; overflow-x:hidden; overflow-y:scroll;">
                         <div class="card-body">
@@ -20,21 +20,21 @@
                                         <th scope="col"> #</th>
                                         <th scope="col">Id</th>
                                         <th scope="col">Country</th>
-                                        <th scope="col">City</th>
+                                        <th scope="col">County</th>
                                         <th scope="col">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @if (Cities.Count <= 0)
+                                    @if (Counties.Count <= 0)
                                     {
                                         <tr>
-                                            <td colspan="5"><div class="alert alert-info text-center">No City added yet!</div></td>
+                                            <td colspan="5"><div class="alert alert-info text-center">No County added yet!</div></td>
                                         </tr>
                                     }
                                     else
                                     {
                                         int count = 1;
-                                        foreach (var item in Cities)
+                                        foreach (var item in Counties)
                                         {
                                             <tr>
                                                 <th>@count</th>
@@ -65,34 +65,34 @@
 
 @code {
     [CascadingParameter] public IModalService Modal { get; set; } = default!;
-    City City = new();
-    CityDialog? CityDialog;
+    County County = new();
+    CountyDialog? CountyDialog;
     public string Title { get; set; } = "Add";
 
-    public List<Country> Countryes { get; set; } = new();
-    public List<City> Cities { get; set; } = new();
+    public List<Country> Countries { get; set; } = new();
+    public List<County> Counties { get; set; } = new();
 
     
     protected async override void OnInitialized()
     { 
-        await GetCities();
+        await GetCounties();
         await GetCountryes();
         allState.Action += StateHasChanged;
     }
 
     private async Task GetCountryes()
     {
-        Countryes = await countryService.GetAll(Constants.CountryBaseUrl);
+        Countries = await countryService.GetAll(Constants.CountryBaseUrl);
     }
-    private async Task GetCities()
+    private async Task GetCounties()
     {
-        Cities = await cityService.GetAll(Constants.CityBaseUrl);
+        Counties = await countyService.GetAll(Constants.CountyBaseUrl);
     }
 
     async Task AddOpenDialog()
     {
         Title = "Add";
-        City = new();
+        County = new();
         await OpenDialog();
     }
 
@@ -102,10 +102,10 @@
         if (Title == "Update")
         {
             var parameters = new ModalParameters()
-        .Add(nameof(CityDialog.City), City);
+        .Add(nameof(CountyDialog.County), County);
 
 
-            var form = Modal.Show<CityDialog>($"{Title} City", parameters);
+            var form = Modal.Show<CountyDialog>($"{Title} County", parameters);
             var result = await form.Result;
 
             if (result.Confirmed)
@@ -116,15 +116,15 @@
 
                 if (temp.Length == 2)
                 {
-                    City.Name = temp[0];
+                    County.Name = temp[0];
                     t1 = temp[1];
                     int.TryParse(t1, out t2);
                     if (int.TryParse(t1, out t2))
                     {
-                        City.CountryId = t2;
+                        County.CountryId = t2;
 
 
-                        await HandleSaveOperationEvent(City);
+                        await HandleSaveOperationEvent(County);
 
                     }
 
@@ -134,7 +134,7 @@
         }
         else
         {
-            var form = Modal.Show<CityDialog>($"{Title} City");
+            var form = Modal.Show<CountyDialog>($"{Title} County");
             var result = await form.Result;
 
             if (result.Confirmed)
@@ -145,15 +145,15 @@
 
                 if (temp.Length == 2)
                 {
-                    City.Name = temp[0];
+                    County.Name = temp[0];
                     t1 = temp[1];
                     int.TryParse(t1, out t2);
                     if (int.TryParse(t1, out t2))
                     {
-                        City.CountryId = t2;
+                        County.CountryId = t2;
 
 
-                        await HandleSaveOperationEvent(City);
+                        await HandleSaveOperationEvent(County);
 
                     }
 
@@ -163,51 +163,51 @@
         }
     }
 
-    private async Task HandleSaveOperationEvent(City city)
+    private async Task HandleSaveOperationEvent(County county)
     {
         bool successCheck = false;
-        if (city.Id > 0)
+        if (county.Id > 0)
         {
-            var result = await cityService
-            .Update(city, Constants.CityBaseUrl);
+            var result = await countyService
+            .Update(county, Constants.CountyBaseUrl);
             successCheck = await DisplayMassage(result.Flag, result.Massage);
 
         }
         else
         {
-            var response = await cityService
-            .Insert(city, Constants.CityBaseUrl);
+            var response = await countyService
+            .Insert(county, Constants.CountyBaseUrl);
             successCheck = await DisplayMassage(response.Flag, response.Massage);
 
         }
         if (successCheck)
         {
-            City = new();
-            await GetCities();
+            County = new();
+            await GetCounties();
             Title = "Add";
             StateHasChanged();
         }
     }
-    private async void EditClicked(City city)
+    private async void EditClicked(County county)
     {
         Title = "Update";
-        City = city;
-        await GetCities();
+        County = county;
+        await GetCounties();
         await OpenDialog();
 
     }
 
-    private async void DeleteClicked(City city)
+    private async void DeleteClicked(County county)
     {
-        var confirmModal = Modal.Show<ConfirmationDialog>($"Are you sure you wanna delete {city.Name}?");
+        var confirmModal = Modal.Show<ConfirmationDialog>($"Are you sure you wanna delete {county.Name}?");
         var result = await confirmModal.Result;
 
         if (result.Cancelled) return;
 
-        var response = await cityService.DeleteById(city.Id, Constants.CityBaseUrl);
+        var response = await countyService.DeleteById(county.Id, Constants.CountyBaseUrl);
         if (await DisplayMassage(response.Flag, response.Massage))
         {
-            await GetCities();
+            await GetCounties();
             StateHasChanged();
         }
     }

@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace ServerLibrary.Migrations
+namespace ServerLibrary.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class test : Migration
+    public partial class first : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -27,7 +27,7 @@ namespace ServerLibrary.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Countrys",
+                name: "Countries",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -36,7 +36,7 @@ namespace ServerLibrary.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Countrys", x => x.Id);
+                    table.PrimaryKey("PK_Countries", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -149,7 +149,7 @@ namespace ServerLibrary.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Citys",
+                name: "Counties",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -159,11 +159,11 @@ namespace ServerLibrary.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Citys", x => x.Id);
+                    table.PrimaryKey("PK_Counties", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Citys_Countrys_CountryId",
+                        name: "FK_Counties_Countries_CountryId",
                         column: x => x.CountryId,
-                        principalTable: "Countrys",
+                        principalTable: "Countries",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -195,7 +195,7 @@ namespace ServerLibrary.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    NumberOfHours = table.Column<int>(type: "int", nullable: false),
                     OvertimeTypeId = table.Column<int>(type: "int", nullable: false),
                     EmployeeId = table.Column<int>(type: "int", nullable: false)
                 },
@@ -261,16 +261,16 @@ namespace ServerLibrary.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CityId = table.Column<int>(type: "int", nullable: false),
+                    CountyId = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Towns", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Towns_Citys_CityId",
-                        column: x => x.CityId,
-                        principalTable: "Citys",
+                        name: "FK_Towns_Counties_CountyId",
+                        column: x => x.CountyId,
+                        principalTable: "Counties",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -335,8 +335,8 @@ namespace ServerLibrary.Migrations
                 column: "DepartmentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Citys_CountryId",
-                table: "Citys",
+                name: "IX_Counties_CountryId",
+                table: "Counties",
                 column: "CountryId");
 
             migrationBuilder.CreateIndex(
@@ -365,9 +365,9 @@ namespace ServerLibrary.Migrations
                 column: "SanctionTypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Towns_CityId",
+                name: "IX_Towns_CountyId",
                 table: "Towns",
-                column: "CityId");
+                column: "CountyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Vacations_VacationTypeId",
@@ -424,13 +424,13 @@ namespace ServerLibrary.Migrations
                 name: "Departments");
 
             migrationBuilder.DropTable(
-                name: "Citys");
+                name: "Counties");
 
             migrationBuilder.DropTable(
                 name: "GeneralDepartments");
 
             migrationBuilder.DropTable(
-                name: "Countrys");
+                name: "Countries");
         }
     }
 }

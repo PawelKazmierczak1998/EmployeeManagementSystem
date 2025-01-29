@@ -7,7 +7,7 @@ namespace Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CityController (IGenericRepository <City> genericRepository) : GenericController<City>(genericRepository)
+    public class CountyController(IGenericRepository <County> genericRepository) : GenericController<County>(genericRepository)
     {
     }
 }

@@ -34,9 +34,9 @@ builder.Services.AddScoped<IGenericServiceInterface<GeneralDepartment>, GenericS
 builder.Services.AddScoped<IGenericServiceInterface<Department>, GenericServiceImplementation<Department>>();
 builder.Services.AddScoped<IGenericServiceInterface<Branch>, GenericServiceImplementation<Branch>>();
 
-// Country / City / Town
+// Country / County / Town
 builder.Services.AddScoped<IGenericServiceInterface<Country>, GenericServiceImplementation<Country>>();
-builder.Services.AddScoped<IGenericServiceInterface<City>, GenericServiceImplementation<City>>();
+builder.Services.AddScoped<IGenericServiceInterface<County>, GenericServiceImplementation<County>>();
 builder.Services.AddScoped<IGenericServiceInterface<Town>, GenericServiceImplementation<Town>>();
 
 // Employee

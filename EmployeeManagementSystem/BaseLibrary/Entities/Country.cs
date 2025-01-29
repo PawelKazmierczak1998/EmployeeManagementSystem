@@ -4,8 +4,8 @@ namespace BaseLibrary.Entities
 {
     public class Country : BaseEntity 
     {
-        //Relacja 1 do wielu z City
+        //Relacja 1 do wielu z County
         [JsonIgnore]
-        public List <City>? Cities { get; set; }
+        public List <County>? Counties { get; set; }
     }
 }

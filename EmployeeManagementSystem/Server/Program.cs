@@ -57,7 +57,7 @@ builder.Services.AddScoped<IGenericRepository<Department>, DepartmentRepository>
 builder.Services.AddScoped<IGenericRepository<Branch>, BranchRepository>();
 
 builder.Services.AddScoped<IGenericRepository<Country>, CountryRepository>();
-builder.Services.AddScoped<IGenericRepository<City>, CityRepository>();
+builder.Services.AddScoped<IGenericRepository<County>, CountyRepository>();
 builder.Services.AddScoped<IGenericRepository<Town>, TowRepository>();
 
 builder.Services.AddScoped<IGenericRepository<Overtime>, OvertimeRepository>();

@@ -14,8 +14,7 @@
                         <QuickGrid Items="Overtimes.AsQueryable()">
                             <PropertyColumn Title="Employee Id" Property="e=>e.EmployeeId" />
                             <PropertyColumn Title="Start Date" Property="e=>e.StartDate" />
-                            <PropertyColumn Title="End Date" Property="e=>e.EndDate" />
-                            <PropertyColumn Title="Number Of Days" Property="e=>e.NumberOfDays" />
+                            <PropertyColumn Title="Number Of Hours" Property="e=>e.NumberOfHours" />
                             <PropertyColumn Title="Type" Property="e=>e.OvertimeType.Name" />
                               <TemplateColumn Title="Action">
                                 @{
@@ -97,7 +96,7 @@
                 Overtime.Id = int.Parse(temp[0]);
                 Overtime.EmployeeId = int.Parse(temp[3]);
                 Overtime.StartDate = DateTime.Parse(temp[1]);
-                Overtime.EndDate = DateTime.Parse(temp[2]);
+                Overtime.NumberOfHours = int.Parse(temp[2]);
                 Overtime.OvertimeTypeId = int.Parse(temp[4]);
                 await SaveOvertimeEvent(Overtime, Overtime.EmployeeId);
             }

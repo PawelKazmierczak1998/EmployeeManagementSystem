@@ -12,9 +12,7 @@ namespace BaseLibrary.Entities
         [Required]
         public DateTime StartDate { get; set; }
         [Required]
-        public DateTime EndDate { get; set; }
-
-        public int NumberOfDays => (EndDate-StartDate).Days;
+        public int NumberOfHours { get; set; }
 
         //Relacja wielu do 1 z VacationType
         public OvertimeType?    OvertimeType { get; set; }

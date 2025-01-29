@@ -25,8 +25,8 @@
                         {
                             <div class="@FloatingNumber1 text-center">1</div>
                             <div class="@Floatingdiv1"> </div>
-                            <div class="@FloatingNumber2 text-center">2</div>
-                            <div class="@Floatingdiv2"> </div>
+                            <div class="@FloatingNumber1 text-center">2</div>
+                            <div class="@Floatingdiv1"> </div>
                         }
 
                     </div>
@@ -217,7 +217,7 @@
                                                 <div><label class="form-label">@(Country == "" ? "Select Country " : $"Selected Country : {Country}")</label></div>
                                                 @if (Title == "Update")
                                                 {
-                                                    string slected = Employee.Town!.City!.Country!.Name!;
+                                                    string slected = Employee.Town!.County!.Country!.Name!;
                                                     <select id="Countries" @onchange="OnValueChangeCountries">
                                                         <option value="0">@slected</option>
                                                         @foreach (var item in Countries)
@@ -239,13 +239,13 @@
 
                                             </div>
                                             <div class="form-group mt-3">
-                                                <div><label class="form-label">@(City == "" ? "Select  City" : $"Selected  City: {City}")</label></div>
+                                                <div><label class="form-label">@(County == "" ? "Select  County" : $"Selected  County: {County}")</label></div>
                                                 @if (Title == "Update")
                                                 {
-                                                    string slected = Employee.Town!.City!.Name!;
-                                                    <select id="Cities" @onchange="OnValueChangeCities">
+                                                    string slected = Employee.Town!.County!.Name!;
+                                                    <select id="Counties" @onchange="OnValueChangeCities">
                                                         <option value="0">@slected</option>
-                                                        @foreach (var item in Cities)
+                                                        @foreach (var item in Counties)
                                                         {
                                                             <option value="@item.Id">@item.Name</option>
                                                         }
@@ -253,9 +253,9 @@
                                                 }
                                                 else
                                                 {
-                                                    <select id="Cities" @onchange="OnValueChangeCities">
-                                                        <option value="0">-- Select a City --</option>
-                                                        @foreach (var item in Cities)
+                                                    <select id="Counties" @onchange="OnValueChangeCities">
+                                                        <option value="0">-- Select a County --</option>
+                                                        @foreach (var item in Counties)
                                                         {
                                                             <option value="@item.Id">@item.Name</option>
                                                         }
@@ -355,7 +355,8 @@
 
 
     [Parameter] public List<Country> Countries { get; set; } = new();
-    [Parameter] public List<City> Cities { get; set; } = new();
+    [Parameter] public List<County> Cities { get; set; } = new();
+    [Parameter] public List<County> Counties { get; set; } = new();
     [Parameter] public List<Town> Towns { get; set; } = new();
 
 
@@ -377,13 +378,14 @@
     public string Department { get; set; } = string.Empty;
     public string Branch { get; set; } = string.Empty;
     public string Country { get; set; } = string.Empty;
-    public string City { get; set; } = string.Empty;
+    public string County { get; set; } = string.Empty;
     public string Town { get; set; } = string.Empty;
 
 
     private void ShowLayer2()
     {
         FirstLayer = false;
+
         SecondLayer = true;
 
     }
@@ -409,7 +411,7 @@
         allState.Action += StateHasChanged;
     }
 
-    // Country / City / Town
+    // Country / County / Town
     [Parameter] public EventCallback<int> HandleCountrySelectionEvent { get; set; }
     public void OnValueChangeCountries(ChangeEventArgs args)
     {

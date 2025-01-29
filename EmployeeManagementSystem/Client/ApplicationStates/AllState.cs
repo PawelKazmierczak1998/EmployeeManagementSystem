@@ -46,13 +46,13 @@
 
             Action?.Invoke();
         }
-        // City
-        public bool ShowCity { get; set; }
-        public void CityClicked()
+        // County
+        public bool ShowCounty { get; set; }
+        public void CountyClicked()
         {
             ResetAllDepartments();
 
-            ShowCity = true;
+            ShowCounty = true;
 
             Action?.Invoke();
         }
@@ -86,6 +86,16 @@
 
             Action?.Invoke();
         }
+        public bool ShowDetailsPage { get; set; }
+        public void EmployeeDetailsPageClicked()
+        {
+            ResetAllDepartments();
+
+            ShowDetailsPage = true;
+
+            Action?.Invoke();
+        }
+
         // Health
         public bool ShowHealth { get; set; } 
         public void HealthClicked()
@@ -178,7 +188,7 @@
             ShowDepartment = false;
             ShowBranch = false;
             ShowCountry = false;
-            ShowCity = false;
+            ShowCounty = false;
             ShowTown = false;
             ShowUser = false;
             ShowEmployee = false;
@@ -189,6 +199,7 @@
             ShowSanctionType = false;
             ShowVacation = false;
             ShowVacationType = false;
+            ShowDetailsPage = false;
         }
     }
 }

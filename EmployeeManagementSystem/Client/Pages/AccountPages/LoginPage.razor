@@ -68,20 +68,31 @@
     async Task HandleLogin()
     {
         ShowLoadingButton = true;
-        var result = await accountService.SignInAsync(User);
-        if (result.Flag)
+        try
         {
-            await DisplayMassage(result.Flag, "Login Success");
-            var customAuthStateProvaider = (CustomAuthenticationStateProvider)AuthStateProvider;
-            await customAuthStateProvaider.UpdateAuthenticationState(new UserSession()
-                { Token = result.Token, RefreshToken = result.RefreshToken });
-            NavManager.NavigateTo("/", forceLoad: true);
+            var result = await accountService.SignInAsync(User);
+            if (result.Flag)
+            {
+                await DisplayMassage(result.Flag, "Login Success");
+                var customAuthStateProvaider = (CustomAuthenticationStateProvider)AuthStateProvider;
+                await customAuthStateProvaider.UpdateAuthenticationState(new UserSession()
+                    { Token = result.Token, RefreshToken = result.RefreshToken });
+                await Task.Delay(3000);
+                NavManager.NavigateTo("/", forceLoad: true);
+            }
+            else
+            {
+                await DisplayMassage(result.Flag, result.Massage);
+            }
+            ShowLoadingButton = false;
         }
-        else
-        {
-            await DisplayMassage(result.Flag, result.Massage);
+        catch(Exception ex)
+        { 
+            await DisplayMassage(false, $"Can not open connection ! Error: {ex.Message}");
+            ShowLoadingButton = false;
+            await Task.Delay(3000);
+            NavManager.NavigateTo("/identity/account/login", forceLoad: true);
         }
-        ShowLoadingButton = false;
     }
 
     private async Task<bool> DisplayMassage(bool flag, string massage)

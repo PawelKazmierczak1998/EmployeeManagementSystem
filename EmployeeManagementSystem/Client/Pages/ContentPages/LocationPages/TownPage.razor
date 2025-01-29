@@ -10,7 +10,7 @@
                 <div class="card">
                     <div class="card-header">
                         <h4 class="float-start">Town</h4>
-                        <button class="btn btn-outline-success float-end" @onclick="AddOpenDialog"><i class="bi bi-plus-circle-doted"></i>Add Department</button>
+                        <button class="btn btn-outline-success float-end" @onclick="AddOpenDialog"><i class="bi bi-plus-circle-doted"></i>Add Town</button>
                     </div>
                     <div class="card-header" style="max-height:580px; overflow-x:hidden; overflow-y:scroll;">
                         <div class="card-body">
@@ -19,7 +19,7 @@
                                     <tr>
                                         <th scope="col"> #</th>
                                         <th scope="col">Id</th>
-                                        <th scope="col">City</th>
+                                        <th scope="col">County</th>
                                         <th scope="col">Town</th>
                                         <th scope="col">Action</th>
                                     </tr>
@@ -42,7 +42,7 @@
                                             <tr>
                                                 <td>@count</td>
                                                 <td>@item.Id</td>
-                                                <td>@item.City!.Name</td>
+                                                <td>@item.County!.Name</td>
                                                 <td>@item.Name</td>
                                                 <td>
                                                     <i class="bi bi-pencil text-info" @onclick="()=>EditClicked(item)"></i>
@@ -73,7 +73,7 @@
     public string Title { get; set; } = "Add";
 
     public List<Town> Towns { get; set; } = new();
-    public List<City> Cities { get; set; } = new();
+    public List<County> Cities { get; set; } = new();
 
 
     protected async override void OnInitialized()
@@ -89,7 +89,7 @@
     }
     private async Task GetCities()
     {
-        Cities = await cityService.GetAll(Constants.CityBaseUrl);
+        Cities = await countyService.GetAll(Constants.CountyBaseUrl);
     }
 
     async Task AddOpenDialog()
@@ -124,7 +124,7 @@
                     int.TryParse(t1, out t2);
                     if (int.TryParse(t1, out t2))
                     {
-                        Town.CityId = t2;
+                        Town.CountyId = t2;
 
 
                         await HandleSaveOperationEvent(Town);
@@ -153,7 +153,7 @@
                     int.TryParse(t1, out t2);
                     if (int.TryParse(t1, out t2))
                     {
-                        Town.CityId = t2;
+                        Town.CountyId = t2;
 
 
                         await HandleSaveOperationEvent(Town);
