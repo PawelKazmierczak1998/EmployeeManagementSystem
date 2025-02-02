@@ -60,3 +60,7 @@ This project is a Employee Management System implemented using ASP.NET Core 8 fo
 ### Data Base Migration and Update
 - add-migration [name] -o Data/Migration # Before starting, make sure you select the correct project in the package manager console [ServerLibrary] and select the correct startup item [Server].(Applies only in cases where the Data folder does not contain mgration)
 - update-database 
+### Running Applications in Visual Studio
+In order to run the application correctly in Visual Studio, both projects(Client, Server) should be launched using Https
+
+![image](https://github.com/user-attachments/assets/dfb062c6-0f42-4165-857c-6cde01c33c85)
