@@ -231,7 +231,7 @@ HandleSaveEmployeeClickedEvent="HandleSaveEmployeeClickedEvent" />
 
     private async void DeleteClicked(Employee employee)
     {
-        var confirmModal = Modal.Show<ConfirmationDialog>($"Are you sure you wanna delete {employee.Id}?");
+        var confirmModal = Modal.Show<ConfirmationDialog>($"Are you sure you wanna delete {employee.Name}?");
         var result = await confirmModal.Result;
 
         if (result.Cancelled) return;
