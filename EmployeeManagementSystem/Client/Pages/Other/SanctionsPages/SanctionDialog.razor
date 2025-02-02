@@ -59,8 +59,10 @@
     {
         SanctionTypes = await sanctionTypeService.GetAll(Constants.SanctionTypeBaseUrl);
         Sanction.EmployeeId = i;
-        Sanction.Date = DateTime.Now;
-        Sanction.PunishmentDate = Sanction.Date.AddMonths(12);
+        if(Sanction.Id!=0){
+          Sanction.Date = DateTime.Now;
+          Sanction.PunishmentDate = Sanction.Date.AddMonths(12);
+        }
         allState.Action += StateHasChanged;
         StateHasChanged();
     }

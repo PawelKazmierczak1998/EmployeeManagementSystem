@@ -84,9 +84,9 @@
         if (Title.Contains("Update"))
         {
             var parameters = new ModalParameters()
-                    .Add(nameof(SanctionDialog.i), sanction.EmployeeId);
+                    .Add(nameof(SanctionDialog.Sanction), sanction);
 
-            var form = Modal.Show<OvertimeDialog>($"Update Employee Sanction Information", parameters);
+            var form = Modal.Show<SanctionDialog>($"Update Employee Sanction Information", parameters);
             var result = await form.Result;
 
             if (result.Confirmed)

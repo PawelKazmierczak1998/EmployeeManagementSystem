@@ -79,7 +79,7 @@
         if (Title.Contains("Update"))
         {
 
-            var parameter = new ModalParameters().Add(nameof(DoctorDialog.i),doctor.EmployeeId);
+            var parameter = new ModalParameters().Add(nameof(DoctorDialog.Doctor),doctor);
 
             var form = Modal.Show<DoctorDialog>($"{Title} Employee Health Issue", parameter);
             var result = await form.Result;

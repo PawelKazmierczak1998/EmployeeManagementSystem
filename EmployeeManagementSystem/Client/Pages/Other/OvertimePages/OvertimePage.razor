@@ -84,9 +84,9 @@
         if (Title.Contains("Update"))
         {
             var parameters = new ModalParameters()
-                    .Add(nameof(OvertimeDialog.i), overtime.EmployeeId);
+                    .Add(nameof(OvertimeDialog.Overtime), overtime);
 
-            var form = Modal.Show<OvertimeDialog>($"Add Employee Overtime Information", parameters);
+            var form = Modal.Show<OvertimeDialog>($"Update Employee Overtime Information", parameters);
             var result = await form.Result;
 
             if (result.Confirmed)
