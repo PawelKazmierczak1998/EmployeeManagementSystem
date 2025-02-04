@@ -61,6 +61,8 @@
     public async void DeleteButtonClicked(Doctor doctor)
     {
         var confirmModal = Modal.Show<ConfirmationDialog>($"Are you sure you wanna delete {doctor.Id}?");
+
+
         var result = await confirmModal.Result;
 
         if (result.Cancelled) return;
@@ -79,7 +81,7 @@
 
         if (Title.Contains("Update"))
         {
-
+            // await DisplayMassage(false, $"{doctor.EmployeeId}");
             var parameter = new ModalParameters().Add(nameof(DoctorDialog.Doctor),doctor);
 
             var form = Modal.Show<DoctorDialog>($"{Title} Employee Health Issue", parameter);
@@ -88,13 +90,13 @@
             if (result.Confirmed)
             {
                 var temp = result.Data.ToString().Split(';');
-                // await DisplayMassage(false, $"Data:{temp[0]}, MedicalDiagnose:{temp[1]}, MedicalRecommendation: {temp[2]}");
-
+                
+                Doctor.Id = doctor.Id;
                 Doctor.Date = DateTime.Parse(temp[0]);
                 Doctor.MedicalDiagnose = temp[1];
                 Doctor.MedicalRecommendation = temp[2];
                 Doctor.EmployeeId = int.Parse(temp[3]);
-                await SaveHealthEvent(Doctor, Doctor.EmployeeId);
+                await SaveHealthEvent(Doctor);
                 Title = "Add";
             }
 
@@ -107,14 +109,14 @@
             if (result.Confirmed)
             {
                 var temp = result.Data.ToString().Split(';');
-                // await DisplayMassage(false, $"Data:{temp[0]}, MedicalDiagnose:{temp[1]}, MedicalRecommendation: {temp[2]}");
-
+               
+                Doctor.Id = doctor.Id;
                 Doctor.Date = DateTime.Parse(temp[0]);
                 Doctor.MedicalDiagnose = temp[1];
                 Doctor.MedicalRecommendation = temp[2];
                 Doctor.EmployeeId = int.Parse(temp[3]);
-                await SaveHealthEvent(Doctor, Doctor.EmployeeId);
-                Title = "Add";
+                await SaveHealthEvent(Doctor);
+                Title = "Update";
             }
 
         }
@@ -125,9 +127,8 @@
 
 
     }
-    async Task SaveHealthEvent(Doctor item, int employeeId)
+    async Task SaveHealthEvent(Doctor item)
     {
-        item.EmployeeId = employeeId;
         var (flag, massage) = await doctorService.Update(item, Constants.DoctorBaseUrl);
         var response = await DisplayMassage(flag, massage);
         if (response)
