@@ -11,23 +11,23 @@
                     <div class="card-body">
                         @if (Vacations.Count !=0)
                         {
-                        <QuickGrid Items="Vacations.AsQueryable()">
-                            <PropertyColumn Title="Employee Id" Property="e=>e.EmployeeId" />
-                            <PropertyColumn Title="Start Date" Property="e=>e.StartDate" />
-                            <PropertyColumn Title="End Date" Property="e=>e.EndDate" />
-                            <PropertyColumn Title="Number Of Days" Property="e=>e.NumberOfDays" />
-                            <PropertyColumn Title="Type" Property="e=>e.VacationType!.Name" />
-                            <TemplateColumn Title="Action">
-                                @{
-                                    var vacation = (context as Vacation);
-                                    <div>
-                                        <i class="bi bi-pencil text-info" @onclick="()=>EditButtonClicked(vacation)"></i>
-                                        <i class="bi bi-trash text-danger" @onclick="()=>DeleteButtonClicked(vacation)"></i>                            
-                                    </div>
+                            <QuickGrid Items="Vacations.AsQueryable()">
+                                <PropertyColumn Title="Employee Id" Property="e=>e.EmployeeId" />
+                                <PropertyColumn Title="Start Date" Property="e=>e.StartDate" />
+                                <PropertyColumn Title="End Date" Property="e=>e.EndDate" />
+                                <PropertyColumn Title="Number Of Days" Property="e=>e.NumberOfDays" />
+                                <PropertyColumn Title="Type" Property="e=>e.VacationType!.Name" />
+                                <TemplateColumn Title="Action">
+                                    @{
+                                        var vacation = (context as Vacation);
+                                        <div>
+                                            <i class="bi bi-pencil text-info" @onclick="()=>EditButtonClicked(vacation)"></i>
+                                            <i class="bi bi-trash text-danger" @onclick="()=>DeleteButtonClicked(vacation)"></i>                            
+                                        </div>
 
-                                }
-                            </TemplateColumn>
-                        </QuickGrid>
+                                    }
+                                </TemplateColumn>
+                            </QuickGrid>
                         }
                         else
                         {
@@ -76,6 +76,7 @@
         {
             await GetSanctions();
             StateHasChanged();
+            ReloadPage();
         }
     }
 
@@ -115,6 +116,8 @@
         if (response)
         {
             Vacation = new();
+            StateHasChanged();
+            ReloadPage();
         }
     }
     public void EditButtonClicked(Vacation vacation)
@@ -141,6 +144,12 @@
                 ("Alert", parameters);
             return false;
         }
+    }
+    private void ReloadPage()
+    {
+        allState.ResetAll();
+        allState.SanctionTypeClicked();
+        NavManager.NavigateTo("/home/dashboard", true);
     }
 
     public void Dispose() => allState.Action -= StateHasChanged;

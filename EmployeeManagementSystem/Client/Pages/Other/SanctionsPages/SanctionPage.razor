@@ -42,7 +42,7 @@
 }
 
 @code {
-        [CascadingParameter] public IModalService Modal { get; set; } = default!;
+    [CascadingParameter] public IModalService Modal { get; set; } = default!;
     public Sanction Sanction { get; set; } = new();
     public List<Sanction> Sanctions { get; set; } = new();
     public string Title { get; set; } = "Add";
@@ -75,6 +75,7 @@
         {
             await GetSanctions();
             StateHasChanged();
+            ReloadPage();
         }
     }
 
@@ -115,6 +116,8 @@
         if (response)
         {
             Sanction = new();
+            StateHasChanged();
+            ReloadPage();
         }
     }
     public void EditButtonClicked(Sanction sanction)
@@ -142,6 +145,11 @@
             return false;
         }
     }
-
+    private void ReloadPage()
+    {
+        allState.ResetAll();
+        allState.SanctionClicked();
+        NavManager.NavigateTo("/home/dashboard", true);
+    }
     public void Dispose() => allState.Action -= StateHasChanged;
 }

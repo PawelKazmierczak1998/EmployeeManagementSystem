@@ -33,7 +33,7 @@
                                     }
                                     else
                                     {
-                                       
+
                                         int count = 1;
                                         foreach (var item in Departments)
                                         {
@@ -184,6 +184,7 @@
             await GetDepartments();
             Title = "Add";
             StateHasChanged();
+            ReloadPage();
         }
     }
     private async void EditClicked(Department dep)
@@ -207,6 +208,7 @@
         {
             await GetDepartments();
             StateHasChanged();
+            ReloadPage();
         }
     }
 
@@ -228,6 +230,12 @@
             Modal.Show<DisplayMessage>("Alert", parameters);
             return false;
         }
+    }
+    private void ReloadPage()
+    {
+        allState.ResetAll();
+        allState.DepartmentClicked();
+        NavManager.NavigateTo("/home/dashboard", true);
     }
     public void Dispose()
     {

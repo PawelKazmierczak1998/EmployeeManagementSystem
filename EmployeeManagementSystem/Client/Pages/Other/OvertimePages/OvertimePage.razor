@@ -11,23 +11,23 @@
                     <div class="card-body">
                         @if (Overtimes.Count != 0)
                         {
-                        <QuickGrid Items="Overtimes.AsQueryable()">
-                            <PropertyColumn Title="Employee Id" Property="e=>e.EmployeeId" />
-                            <PropertyColumn Title="Start Date" Property="e=>e.StartDate" />
-                            <PropertyColumn Title="Number Of Hours" Property="e=>e.NumberOfHours" />
-                            <PropertyColumn Title="Type" Property="e=>e.OvertimeType.Name" />
-                              <TemplateColumn Title="Action">
-                                @{
-                                    var overtime = (context as Overtime);
-                                    <div>
-                                        <i class="bi bi-pencil text-info" @onclick="()=>EditButtonClicked(overtime)"></i>
-                                        <i class="bi bi-trash text-danger" @onclick="()=>DeleteButtonClicked(overtime)"></i>
-                                
-                                    </div>
+                            <QuickGrid Items="Overtimes.AsQueryable()">
+                                <PropertyColumn Title="Employee Id" Property="e=>e.EmployeeId" />
+                                <PropertyColumn Title="Start Date" Property="e=>e.StartDate" />
+                                <PropertyColumn Title="Number Of Hours" Property="e=>e.NumberOfHours" />
+                                <PropertyColumn Title="Type" Property="e=>e.OvertimeType.Name" />
+                                <TemplateColumn Title="Action">
+                                    @{
+                                        var overtime = (context as Overtime);
+                                        <div>
+                                            <i class="bi bi-pencil text-info" @onclick="()=>EditButtonClicked(overtime)"></i>
+                                            <i class="bi bi-trash text-danger" @onclick="()=>DeleteButtonClicked(overtime)"></i>
 
-                                }
-                            </TemplateColumn>
-                        </QuickGrid>
+                                        </div>
+
+                                    }
+                                </TemplateColumn>
+                            </QuickGrid>
                         }
                         else
                         {
@@ -75,6 +75,7 @@
         {
             await GetOvertime();
             StateHasChanged();
+            ReloadPage();
         }
     }
 
@@ -102,7 +103,7 @@
             }
 
         }
-       
+
 
 
     }
@@ -114,6 +115,8 @@
         if (response)
         {
             Overtime = new();
+            StateHasChanged();
+            ReloadPage();
         }
     }
     public void EditButtonClicked(Overtime overtime)
@@ -141,6 +144,11 @@
             return false;
         }
     }
-
+    private void ReloadPage()
+    {
+        allState.ResetAll();
+        allState.OvertimeClicked();
+        NavManager.NavigateTo("/home/dashboard", true);
+    }
     public void Dispose() => allState.Action -= StateHasChanged;
 }

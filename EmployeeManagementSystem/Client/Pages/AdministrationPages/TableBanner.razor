@@ -79,6 +79,22 @@
     public List<Sanction> Sanctions { get; set; } = new();
     public List<Department> Departments { get; set; } = new();
 
+    void DepartmentClicked() => allState.DepartmentClicked();
+    void VacationClicked() => allState.VacationClicked();
+    void OvertimeClicked() => allState.OvertimeClicked();
+    void DoctorClicked() => allState.HealthClicked();
+    void SanctionsClicked() => allState.SanctionClicked();
+    void EmployeeClicked() => allState.EmployeeClicked();
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+         await GetAllList();
+         allState.Action += StateHasChanged;
+
+    }
+
     private async Task GetAllList()
     {
         Employees = await employeeService.GetAll(Constants.EmployeeBaseUrl);
@@ -88,16 +104,10 @@
         Sanctions = await sanctionService.GetAll(Constants.SanctionBaseUrl);
         Departments = await departmentService.GetAll(Constants.DepartmentBaseUrl);
     }
-    void DepartmentClicked() => allState.DepartmentClicked();
-    void VacationClicked() => allState.VacationClicked();
-    void OvertimeClicked() => allState.OvertimeClicked();
-    void DoctorClicked() => allState.HealthClicked();
-    void SanctionsClicked() => allState.SanctionClicked();
-    void EmployeeClicked() => allState.EmployeeClicked();
 
-
-    protected async override Task OnInitializedAsync()
+    public void Dispose()
     {
-        await GetAllList();
+
+        allState.Action -= StateHasChanged;
     }
 }

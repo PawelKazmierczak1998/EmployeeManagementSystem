@@ -11,22 +11,22 @@
                     <div class="card-body">
                         @if (Doctors.Count != 0)
                         {
-                        <QuickGrid Items="Doctors.AsQueryable()">
-                            <PropertyColumn Title="Employee Id" Property="e=>e.EmployeeId" />
-                            <PropertyColumn Title="Date" Property="e=>e.Date" />
-                            <PropertyColumn Title="Medical Diagnose" Property="e=>e.MedicalDiagnose" />
-                            <PropertyColumn Title="Medical Recommendation" Property="e=>e.MedicalRecommendation" />
-                            <TemplateColumn Title="Action">
-                                @{
-                                    var doctor = (context as Doctor);
-                                    <div>
-                                        <i class="bi bi-pencil text-info" @onclick="()=>EditButtonClicked(doctor)"></i>
-                                        <i class="bi bi-trash text-danger" @onclick="()=>DeleteButtonClicked(doctor)"></i>
-                                    </div>
+                            <QuickGrid Items="Doctors.AsQueryable()">
+                                <PropertyColumn Title="Employee Id" Property="e=>e.EmployeeId" />
+                                <PropertyColumn Title="Date" Property="e=>e.Date" />
+                                <PropertyColumn Title="Medical Diagnose" Property="e=>e.MedicalDiagnose" />
+                                <PropertyColumn Title="Medical Recommendation" Property="e=>e.MedicalRecommendation" />
+                                <TemplateColumn Title="Action">
+                                    @{
+                                        var doctor = (context as Doctor);
+                                        <div>
+                                            <i class="bi bi-pencil text-info" @onclick="()=>EditButtonClicked(doctor)"></i>
+                                            <i class="bi bi-trash text-danger" @onclick="()=>DeleteButtonClicked(doctor)"></i>
+                                        </div>
 
-                                }
-                            </TemplateColumn>
-                        </QuickGrid>
+                                    }
+                                </TemplateColumn>
+                            </QuickGrid>
                         }
                         else
                         {
@@ -64,12 +64,13 @@
         var result = await confirmModal.Result;
 
         if (result.Cancelled) return;
-       
+
         var response = await doctorService.DeleteById(doctor.Id, Constants.DoctorBaseUrl);
         if (await DisplayMassage(response.Flag, response.Massage))
         {
             await GetHealth();
             StateHasChanged();
+            ReloadPage();
         }
     }
 
@@ -134,6 +135,7 @@
 
             Doctor = new();
             await GetHealth();
+            ReloadPage();
         }
     }
     public void EditButtonClicked(Doctor doctor)
@@ -161,6 +163,11 @@
             return false;
         }
     }
-
+    private void ReloadPage()
+    {
+        allState.ResetAll();
+        allState.HealthClicked();
+        NavManager.NavigateTo("/home/dashboard", true);
+    }
     public void Dispose() => allState.Action -= StateHasChanged;
 }

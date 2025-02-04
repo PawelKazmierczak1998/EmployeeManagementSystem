@@ -23,10 +23,10 @@
                     <option value="0">-- Select a Overtime Type --</option>
                     @foreach (var item in OvertimeTypes)
                     {
-                        <option value="@item.Id">@item.Name</option>
+                        <option value="@item.Id">@item.Name </option>
                     }
                 </select>
-
+                <ValidationMessage For="()=>Overtime.OvertimeTypeId" />
             </div>
         </div>
         <div class="card-footer text-center">
@@ -63,21 +63,28 @@
 
     async Task Save()
     {
-        var returnData = $"{Overtime.Id};{Overtime.StartDate};{Overtime.NumberOfHours};{Overtime.EmployeeId};{Overtime.OvertimeTypeId};";
+
+        if (Overtime.OvertimeTypeId > 0)
+        {
+            var returnData = $"{Overtime.Id};{Overtime.StartDate};{Overtime.NumberOfHours};{Overtime.EmployeeId};{Overtime.OvertimeTypeId};";
 
 
 
-        await HandleSaveOperationEvent.InvokeAsync(Overtime);
-        await BlazoredModal.CloseAsync(ModalResult.Ok(returnData));
+            await HandleSaveOperationEvent.InvokeAsync(Overtime);
+            await BlazoredModal.CloseAsync(ModalResult.Ok(returnData));
 
-
+        }
     }
 
     public void OnValueChangeOvertimeTypes(ChangeEventArgs args)
     {
         if (int.TryParse(args.Value?.ToString(), out int overtimeTypeId))
         {
-            Overtime.OvertimeTypeId = overtimeTypeId;
+            if (overtimeTypeId > 0)
+            {
+                Overtime.OvertimeTypeId = overtimeTypeId;
+            }
+           
         }
 
     }
