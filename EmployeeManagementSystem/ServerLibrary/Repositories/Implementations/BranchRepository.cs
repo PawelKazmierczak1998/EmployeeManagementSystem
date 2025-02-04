@@ -20,8 +20,8 @@ namespace ServerLibrary.Repositories.Implementations
         }
 
         public async Task<List<Branch>> GetAll() => await appDbContext.Branches
-            .AsNoTracking()
             .Include(d=>d.Department)
+            .AsNoTracking()
             .ToListAsync();
 
 

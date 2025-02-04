@@ -1,4 +1,5 @@
-﻿namespace Client.ApplicationStates
+﻿
+namespace Client.ApplicationStates
 {
     public class AllState
     {
@@ -78,11 +79,13 @@
         }
         // Employee
         public bool ShowEmployee { get; set; }
+        public bool ShowMainPage { get; set; }
         public void EmployeeClicked()
         {
             ResetAllDepartments();
 
             ShowEmployee = true;
+            ShowMainPage = true;
 
             Action?.Invoke();
         }
@@ -96,8 +99,18 @@
             Action?.Invoke();
         }
 
+        public bool ShowRaportPage { get; set; }
+        public void EmployeeRaportPageClicked()
+        {
+            ResetAllDepartments();
+
+            ShowRaportPage = true;
+
+            Action?.Invoke();
+        }
+
         // Health
-        public bool ShowHealth { get; set; } 
+        public bool ShowHealth { get; set; }
         public void HealthClicked()
         {
             ResetAllDepartments();
@@ -108,7 +121,7 @@
         }
 
         // Overtime
-        public bool ShowOvertime{ get; set; }
+        public bool ShowOvertime { get; set; }
         public void OvertimeClicked()
         {
             ResetAllDepartments();
@@ -148,9 +161,9 @@
             ShowSanctionType = true;
 
             Action?.Invoke();
-        } 
-        
-        // Sanction
+        }
+
+        // Vacation
         public bool ShowVacation { get; set; }
         public void VacationClicked()
         {
@@ -161,7 +174,7 @@
             Action?.Invoke();
         }
 
-        // Sanction Type
+        // Vacation Type
         public bool ShowVacationType { get; set; }
         public void VacationTypeClicked()
         {
@@ -171,9 +184,6 @@
 
             Action?.Invoke();
         }
-
-
-
 
         public void ResetAll()
         {
@@ -193,13 +203,15 @@
             ShowUser = false;
             ShowEmployee = false;
             ShowHealth = false;
-            ShowOvertime=false;
+            ShowOvertime = false;
             ShowOvertimeType = false;
             ShowSanction = false;
             ShowSanctionType = false;
             ShowVacation = false;
             ShowVacationType = false;
             ShowDetailsPage = false;
+            ShowRaportPage = false;
+            ShowMainPage = false;
         }
     }
 }

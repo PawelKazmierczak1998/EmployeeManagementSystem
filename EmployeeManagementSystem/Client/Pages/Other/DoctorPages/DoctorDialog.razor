@@ -47,7 +47,11 @@
     protected override async void OnInitialized()
     {
         Doctor.Date = DateTime.Now;
-        Doctor.EmployeeId =i;
+        if(i != 0)
+        {
+            Doctor.EmployeeId = i;
+        }
+        
 
         allState.Action += StateHasChanged;
         StateHasChanged();

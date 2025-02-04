@@ -22,13 +22,13 @@ namespace ServerLibrary.Repositories.Implementations
         public async Task<List<Employee>> GetAll()
         {
             var employees = await appDbContext.Employees
-                .AsNoTracking()
                 .Include(t => t.Town)
                 .ThenInclude(b => b.County)
                 .ThenInclude(c => c.Country)
                 .Include(b => b.Branch)
                 .ThenInclude(d => d.Department)
                 .ThenInclude(gd => gd.GeneralDepartment)
+                .AsNoTracking()
                 .ToListAsync();
             return employees;
         }
@@ -36,13 +36,13 @@ namespace ServerLibrary.Repositories.Implementations
         public async Task<Employee> GetById(int id)
         {
             var employee = await appDbContext.Employees
-               .AsNoTracking()
                .Include(t => t.Town)
                .ThenInclude(b => b.County)
                .ThenInclude(c => c.Country)
                .Include(b => b.Branch)
                .ThenInclude(d => d.Department)
                .ThenInclude(gd => gd.GeneralDepartment)
+               .AsNoTracking()
                .FirstOrDefaultAsync(e => e.Id == id)!;
             return employee!;
         }

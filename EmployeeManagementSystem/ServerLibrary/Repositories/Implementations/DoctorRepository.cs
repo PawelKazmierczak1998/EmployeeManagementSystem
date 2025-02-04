@@ -11,14 +11,14 @@ namespace ServerLibrary.Repositories.Implementations
     {
         public async Task<GeneralResponse> DeleteById(int id)
         {
-            var item = await appDbContext.Doctors.FirstOrDefaultAsync(eid => eid.EmployeeId == id);
+            var item = await appDbContext.Doctors.FindAsync(id);
             if (item is null) return NotFound();
 
             appDbContext.Doctors.Remove(item);
             await Commit();
 
             return Success();
-           
+
         }
 
         public async Task<List<Doctor>> GetAll() => await appDbContext
@@ -28,23 +28,24 @@ namespace ServerLibrary.Repositories.Implementations
 
 
         public async Task<Doctor> GetById(int id) => await appDbContext.Doctors.FirstOrDefaultAsync(eid => eid.EmployeeId == id);
-       
+
 
         public async Task<GeneralResponse> Insert(Doctor item)
         {
             appDbContext.Doctors.Add(item);
-            await Commit() ;
+            await Commit();
             return Success();
         }
 
         public async Task<GeneralResponse> Update(Doctor item)
         {
-           var obj = await appDbContext.Doctors.FirstOrDefaultAsync(eid=>eid.EmployeeId == item.EmployeeId);
+            var obj = await appDbContext.Doctors.FirstOrDefaultAsync(eid => eid.Id == item.Id);
             if (obj is null) return NotFound();
             obj.MedicalRecommendation = item.MedicalRecommendation;
             obj.MedicalDiagnose = item.MedicalDiagnose;
             obj.Date = item.Date;
-            await Commit() ; 
+            obj.EmployeeId = item.EmployeeId;
+            await Commit();
             return Success();
         }
 

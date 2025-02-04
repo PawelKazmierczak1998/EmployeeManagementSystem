@@ -24,12 +24,16 @@ namespace ServerLibrary.Repositories.Implementations
         }
 
         public async Task<List<Town>> GetAll() => await appDbContext.Towns
-            .AsNoTracking()
             .Include(c=>c.County)
+            .AsNoTracking()
             .ToListAsync();
 
 
-        public async Task<Town> GetById(int id) => await appDbContext.Towns.FindAsync(id);
+        public async Task<Town> GetById(int id) => await appDbContext.Towns
+            .Include(c => c.County)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(e => e.Id == id);
+
 
         public async Task<GeneralResponse> Insert(Town item)
         {

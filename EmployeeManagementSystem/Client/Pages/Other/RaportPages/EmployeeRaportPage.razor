@@ -1,0 +1,204 @@
+﻿@page "/employee-report"
+@inject IJSRuntime JSRuntime
+
+@if (allState.ShowRaportPage)
+{
+    <div class=" container  border border-dark mt-5" style="border-radius:1%;">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card-header">@Employee.Name Raport</div>
+                <div class="card-body">
+                    <div class="hstack gap-2">
+                        <div class="vstack gap-3">
+                            <img src="@Employee.Photo" class="card-img-top border-warning shadow-sm" style="width:100px; height:100px; border-radius:50%;" />
+                            <table class="table border-danger">
+                                <tbody>
+                                    <tr>
+                                        <td><h6 class="fw-bold">Name:</h6></td>
+                                        <td> @Employee.Name </td>
+                                    </tr>
+                                    <tr>
+                                        <td><h6 class="fw-bold">Job Title:</h6></td>
+                                        <td> @Employee.JobName </td>
+                                    </tr>
+                                    <tr>
+                                        <td><h6 class="fw-bold">File Number:</h6></td>
+                                        <td> @Employee.FileNumber </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="hstack gap-2">
+                        <div class="vstack gap-3">
+                            @if (EmployeeSanctions.Count >= 1)
+                            {
+                                <table class="table border-primary">
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="4" class="text-center"><h6 class="fw-bold">Sanction Information:</h6></td>
+                                        </tr>
+                                        <tr>
+                                            <td><h6 class="fw-bold">Sanction Type:</h6></td>
+                                            @foreach (var item in EmployeeSanctions)
+                                            {
+                                                <td> @item.SanctionType!.Name : @EmployeeSanctions.Where(t => t.SanctionTypeId == item.SanctionTypeId).Count()</td>
+                                            }
+                                        </tr>
+                                        @if (EmployeeSanctions.Count > 2)
+                                        {
+                                            <tr>
+                                                <td><h6 class="fw-bold">Sanction Note and Date:</h6></td>
+                                            </tr>
+                                            @foreach (var item in EmployeeSanctions)
+                                            {
+                                                <tr>
+                                                    <td colspan="4"> @item.Punishment : @item.PunishmentDate</td>
+                                                </tr>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td><h6 class="fw-bold">Sanction Note and Date:</h6></td>
+                                                @foreach (var item in EmployeeSanctions)
+                                                {
+                                                    <td colspan="4"> @item.Punishment : @item.PunishmentDate</td>
+                                                }
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            }
+                            else
+                            {
+                                <div class="table border-primary">
+                                    <h6 class="text-center fw-bold">No sanction for employee</h6>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="hstack gap-2">
+                        <div class="vstack gap-3">
+                            <table class="table border-success">
+                                <tbody>
+                                    <tr>
+                                        <td colspan="4" class="text-center"><h6 class="fw-bold">Overtime Information:</h6></td>
+                                    </tr>
+                                    <tr>
+                                        <td><h6 class="fw-bold">Overtime Type:</h6></td>
+                                        @if (EmployeeOvertimes.Count() >= 1)
+                                        {
+                                            @foreach (var item in EmployeeOvertimes)
+                                            {
+                                                <td> @item.OvertimeType!.Name : @EmployeeOvertimes.Where(t => t.OvertimeTypeId == item.OvertimeTypeId).Count()</td>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <td colspan=","><h6 class="fw-bold">No overtime in Data Base</h6></td>
+                                        }
+                                    </tr>
+                                    <tr>
+                                        <td><h6 class="fw-bold">Number of Overtime in Days:</h6></td>
+                                        @if (SumOfNumbers < 1)
+                                        {
+                                            <td colspan="3">Less than one day</td>
+                                        }
+                                        else
+                                        {
+                                            <td colspan="3">@string.Format("{0:0.00}", SumOfNumbers)</td>
+                                        }
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-danger" @onclick="DetailsPageClosedClicked">Close</button>
+                    <button class="btn btn-primary" @onclick="PrintComponent">Print</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+}
+<style>
+    .print_container {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+        .print_container .card, .print_container .table, .print_container img {
+            border-radius: 0 !important;
+            box-shadow: none !important;
+        }
+
+        .print_container .no-print {
+            display: none !important;
+        }
+
+        .print_container table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .print_container td, .print_container th {
+            border: 1px solid #000;
+            padding: 8px;
+        }
+
+        .print_container img {
+            width: 80px !important;
+            height: 80px !important;
+            border: 1px solid #000 !important;
+        }
+
+        .print_container .card-header {
+            font-size: 1.5em;
+            font-weight: bold;
+            text-align: center;
+            background-color: #f0f0f0 !important;
+        }
+
+        .print_container .card-footer {
+            display: none;
+        }
+
+</style>
+@code {
+    [Parameter] public bool ShowDetailsPage { get; set; }
+    [Parameter] public Employee Employee { get; set; } = new();
+    [Parameter] public EventCallback HandleDetailsPageClosedClicked { get; set; } = new();
+    [Parameter] public List<Sanction> EmployeeSanctions { get; set; } = new();
+    [Parameter] public List<Overtime> EmployeeOvertimes { get; set; } = new();
+    [Parameter] public decimal SumOfNumbers { get; set; }
+
+
+    private string print_container = "print_container";
+    private string noprint_container = "";
+    private bool isPrinting = false;
+
+    private async Task PrintComponent()
+    {
+        var id = Employee.Id;
+
+        var url = $"employee-report-document/{id}";
+
+        JSRuntime.InvokeAsync<object>("open", url);
+        await Task.Delay(1000);
+
+        Employee = new();
+        EmployeeSanctions = new();
+        EmployeeOvertimes = new();
+        SumOfNumbers = new();
+        allState.EmployeeClicked();
+
+    }
+
+    public async void DetailsPageClosedClicked() => await HandleDetailsPageClosedClicked.InvokeAsync();
+
+}

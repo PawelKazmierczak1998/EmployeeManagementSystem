@@ -1,68 +1,69 @@
 ﻿@implements IDisposable
 
-@if (allState.ShowEmployee)
+@if (allState.ShowEmployee && allState.ShowMainPage)
 {
-    @if (ShowMainPage)
-    {
-        <div class="container-fluid mt-5">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <button class="btn btn-outline-success" @onclick="ShowAddOrUpdateEmployeeButtonClicked">
-                                <i class="bi bi-plus-circle-dotted"></i>Add Employee
-                            </button>
-                        </div>
-                        <div class="card-body">
-                            <QuickGrid Items="Employees.AsQueryable()">
-                                <PropertyColumn Property="e=>e.Id" />
-                                <TemplateColumn Title="Photo">
-                                    @{
-                                        var employee = (context as Employee);
-                                        <div class="image">
-                                            <img src="@employee!.Photo" alt="@employee!.Name" width="150" height="150" />
-                                        </div>
-                                    }
-                                </TemplateColumn>
-                                <PropertyColumn Property="e=>e.CivilId" />
-                                <PropertyColumn Property="e=>e.FileNumber" />
-                                <PropertyColumn Property="e=>e.Name" />
-                                <PropertyColumn Property="e=>e.TelephoneNumber" />
-                                <PropertyColumn Property="e=>e.JobName" />
-                                <PropertyColumn Title="Branch" Property="e=>e.Branch!.Name" />
-                                <PropertyColumn Title="Town" Property="e=>e.Town!.Name" />
-                                <TemplateColumn Title="Action">
-                                    @{
-                                        var employee = (context as Employee);
-                                        <div>
-                                            <i class="bi bi-pencil text-info" @onclick="()=>EditClicked(employee)"></i>
-                                            <i class="bi bi-trash text-danger" @onclick="()=>DeleteClicked(employee)"></i>
-                                            <i class="bi bi-file-person text-danger" @onclick="()=>ViewClicked(employee)"></i>
-                                            <hr />
-                                            <i class="bi bi-hospital text-warning" @onclick="()=>AddHealthClicked(employee)"></i>
-                                            @if (OvertimeTypes.Count() != 0 || SanctionTypes.Count() != 0 || VacationTypes.Count() != 0)
-                                            {
-                                                <i class="bi bi-stopwatch text-danger" @onclick="()=>AddOvertimeClicked(employee)"></i>
-                                                <i class="bi bi-octagon text-info" @onclick="()=>AddSanctionClicked(employee)"></i>
-                                                <i class="bi bi-backpack3 text-success" @onclick="()=>AddVacationClicked(employee)"></i>
-                                            }
-                                            else{
-                                                <span> Add Types First</span>
-                                            }
 
-                                        </div>
-
-                                    }
-                                </TemplateColumn>
-
-                            </QuickGrid>
-                        </div>
-                        <div class="card-footer"></div>
+    <div class="container-fluid mt-5">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <button class="btn btn-outline-success" @onclick="ShowAddOrUpdateEmployeeButtonClicked">
+                            <i class="bi bi-plus-circle-dotted"></i>Add Employee
+                        </button>
                     </div>
+                    <div class="card-body">
+                        <QuickGrid Items="Employees.AsQueryable()">
+                            <PropertyColumn Property="e=>e.Id" />
+                            <TemplateColumn Title="Photo">
+                                @{
+                                    var employee = (context as Employee);
+                                    <div class="image">
+                                        <img src="@employee!.Photo" alt="@employee!.Name" width="150" height="150" />
+                                    </div>
+                                }
+                            </TemplateColumn>
+                            <PropertyColumn Property="e=>e.CivilId" />
+                            <PropertyColumn Property="e=>e.FileNumber" />
+                            <PropertyColumn Property="e=>e.Name" />
+                            <PropertyColumn Property="e=>e.TelephoneNumber" />
+                            <PropertyColumn Property="e=>e.JobName" />
+                            <PropertyColumn Title="Branch" Property="e=>e.Branch!.Name" />
+                            <PropertyColumn Title="Town" Property="e=>e.Town!.Name" />
+                            <TemplateColumn Title="Action">
+                                @{
+                                    var employee = (context as Employee);
+                                    <div>
+                                        <i class="bi bi-pencil text-info" @onclick="()=>EditClicked(employee)"></i>
+                                        <i class="bi bi-trash text-danger" @onclick="()=>DeleteClicked(employee)"></i>
+                                        <i class="bi bi-file-person text-danger" @onclick="()=>ViewClicked(employee)"></i>
+                                        <i class="bi bi-file text-danger" @onclick="()=>RaportClicked(employee)"></i>
+                                        <hr />
+                                        <i class="bi bi-hospital text-warning" @onclick="()=>AddHealthClicked(employee)"></i>
+                                        @if (OvertimeTypes.Count() != 0 || SanctionTypes.Count() != 0 || VacationTypes.Count() != 0)
+                                        {
+                                            <i class="bi bi-stopwatch text-danger" @onclick="()=>AddOvertimeClicked(employee)"></i>
+                                            <i class="bi bi-octagon text-info" @onclick="()=>AddSanctionClicked(employee)"></i>
+                                            <i class="bi bi-backpack3 text-success" @onclick="()=>AddVacationClicked(employee)"></i>
+                                        }
+                                        else
+                                        {
+                                            <span> Add Types First</span>
+                                        }
+
+                                    </div>
+
+                                }
+                            </TemplateColumn>
+
+                        </QuickGrid>
+                    </div>
+                    <div class="card-footer"></div>
                 </div>
             </div>
         </div>
-    }
+    </div>
+
 
 }
 
@@ -94,11 +95,14 @@ HandleGeneralDepartmentSelectionEvent="HandleGeneralDepartmentSelectionEvent"
 HandleDepartmententSelectionEvent="HandleDepartmententSelectionEvent"
 HandleSaveEmployeeClickedEvent="HandleSaveEmployeeClickedEvent" />
 
-<EmployeeDetailPage @ref="employeeDetailPage" Employee="Employee"  HandleDetailsPageClosedClicked="HandleDetailsPageClosedClicked" />
+<EmployeeDetailPage @ref="employeeDetailPage" Employee="Employee" HandleDetailsPageClosedClicked="HandleDetailsPageClosedClicked" />
+<EmployeeRaportPage @ref="employeeRaportPage" Employee="Employee" EmployeeOvertimes="EmployeeOvertimes" EmployeeSanctions="EmployeeSanctions" SumOfNumbers="SumOfNumbers" HandleDetailsPageClosedClicked="HandleRaportPageClosedClicked" />
 @code {
     [CascadingParameter] public IModalService Modal { get; set; } = default!;
     AddOrUpdateEmployeePage? addOrUpdateEmployee;
     EmployeeDetailPage? employeeDetailPage;
+    EmployeeRaportPage? employeeRaportPage;
+
     public List<Employee> Employees { get; set; } = [];
     public Employee Employee { get; set; } = new();
     public Doctor Doctor { get; set; } = new();
@@ -119,6 +123,8 @@ HandleSaveEmployeeClickedEvent="HandleSaveEmployeeClickedEvent" />
     public List<OvertimeType> OvertimeTypes { get; set; } = [];
     public List<SanctionType> SanctionTypes { get; set; } = [];
     public List<VacationType> VacationTypes { get; set; } = [];
+    public List<Overtime> Overtimes { get; set; } = [];
+    public List<Sanction> Sanctions { get; set; } = [];
 
 
     protected async override Task OnInitializedAsync()
@@ -131,10 +137,12 @@ HandleSaveEmployeeClickedEvent="HandleSaveEmployeeClickedEvent" />
 
     private async Task GetTypesCount()
     {
-        OvertimeTypes = await overtimeTypeService.GetAll(Constants.OvertimeTypeBaseUrl) ;
+        OvertimeTypes = await overtimeTypeService.GetAll(Constants.OvertimeTypeBaseUrl);
         SanctionTypes = await sanctionTypeService.GetAll(Constants.SanctionTypeBaseUrl);
         VacationTypes = await vacationTypeService.GetAll(Constants.VacationTypeBaseUrl);
 
+        Overtimes = await overtimeService.GetAll(Constants.OvertimeBaseUrl);
+        Sanctions = await sanctionService.GetAll(Constants.SanctionBaseUrl);
     }
 
 
@@ -184,7 +192,12 @@ HandleSaveEmployeeClickedEvent="HandleSaveEmployeeClickedEvent" />
             Title = "Add";
         }
         if (successCheck)
+        {
             addOrUpdateEmployee!.ClearContent();
+            StateHasChanged();
+            ReloadPage();
+        }
+
     }
 
 
@@ -204,7 +217,8 @@ HandleSaveEmployeeClickedEvent="HandleSaveEmployeeClickedEvent" />
             addOrUpdateEmployee!.Title = "Add";
         }
 
-        ShowMainPage = false;
+        ShowMainPage =false;
+        allState.ShowMainPage = false;
         ShowAddOrUpdatePage = true;
     }
 
@@ -212,7 +226,7 @@ HandleSaveEmployeeClickedEvent="HandleSaveEmployeeClickedEvent" />
     {
         Title = "Update";
         Employee = employee;
-        addOrUpdateEmployee.EmployeeGroup1.Name = employee.Name;
+        addOrUpdateEmployee!.EmployeeGroup1.Name = employee.Name;
         addOrUpdateEmployee.EmployeeGroup1.Address = employee.Address;
         addOrUpdateEmployee.EmployeeGroup1.CivilId = employee.CivilId;
         addOrUpdateEmployee.EmployeeGroup1.TelephoneNumber = employee.TelephoneNumber;
@@ -241,6 +255,7 @@ HandleSaveEmployeeClickedEvent="HandleSaveEmployeeClickedEvent" />
         {
             await LoadEmployees();
             StateHasChanged();
+            ReloadPage();
         }
     }
 
@@ -249,6 +264,25 @@ HandleSaveEmployeeClickedEvent="HandleSaveEmployeeClickedEvent" />
         Employee = employee;
 
         allState.EmployeeDetailsPageClicked();
+        ShowMainPage = false;
+    }
+    public List<Sanction> EmployeeSanctions { get; set; } = new();
+    public List<Overtime> EmployeeOvertimes { get; set; } = new();
+    public decimal SumOfNumbers { get; set; }
+    private async void RaportClicked(Employee employee)
+    {
+        Employee = employee;
+        EmployeeSanctions = Sanctions.Where(e => e.EmployeeId == employee.Id).ToList();
+        EmployeeOvertimes = Overtimes.Where(e => e.EmployeeId == employee.Id).ToList();
+        foreach (var item in EmployeeOvertimes)
+        {
+            SumOfNumbers += item.NumberOfHours;
+        }
+        if (SumOfNumbers != 0)
+        {
+            SumOfNumbers = SumOfNumbers / 24;
+        }
+        allState.EmployeeRaportPageClicked();
         ShowMainPage = false;
     }
 
@@ -307,7 +341,10 @@ HandleSaveEmployeeClickedEvent="HandleSaveEmployeeClickedEvent" />
         if (response)
         {
             Overtime = new();
+            StateHasChanged();
+            ReloadPage();
         }
+        ReloadPage();
     }
 
     Sanction Sanction = new();
@@ -341,7 +378,10 @@ HandleSaveEmployeeClickedEvent="HandleSaveEmployeeClickedEvent" />
         if (response)
         {
             Sanction = new();
+            ReloadPage();
+            StateHasChanged();
         }
+        ReloadPage();
     }
 
     Vacation Vacation = new();
@@ -367,6 +407,7 @@ HandleSaveEmployeeClickedEvent="HandleSaveEmployeeClickedEvent" />
             Vacation.NumberOfDays = int.Parse(temp[3]);
 
             await SaveVacationEvent(Vacation);
+
         }
 
     }
@@ -377,24 +418,35 @@ HandleSaveEmployeeClickedEvent="HandleSaveEmployeeClickedEvent" />
         if (response)
         {
             Vacation = new();
+            ReloadPage();
+            StateHasChanged();
         }
+        ReloadPage();
     }
 
-    async Task SaveHealthEvent(Doctor item,int employeeId)
+    async Task SaveHealthEvent(Doctor item, int employeeId)
     {
         item.EmployeeId = employeeId;
-        var (flag, massage) = await doctorService.Insert(item,Constants.DoctorBaseUrl);
+        var (flag, massage) = await doctorService.Insert(item, Constants.DoctorBaseUrl);
         var response = await DisplayMassage(flag, massage);
-        if(response)
+        if (response)
         {
             Doctor = new();
+            ReloadPage();
+            StateHasChanged();
         }
+        ReloadPage();
     }
 
     void HandleDetailsPageClosedClicked()
     {
-        allState.ShowDetailsPage = false;
-        ShowMainPage = true;
+        allState.EmployeeClicked();
+        
+    }
+    void HandleRaportPageClosedClicked()
+    {
+        allState.EmployeeClicked();
+        
     }
 
     private async Task<bool>
@@ -417,6 +469,13 @@ HandleSaveEmployeeClickedEvent="HandleSaveEmployeeClickedEvent" />
                 ("Alert", parameters);
             return false;
         }
+    }
+
+    private void ReloadPage()
+    {
+        allState.ResetAll();
+        allState.EmployeeClicked();
+        NavManager.NavigateTo("/home/dashboard", true);
     }
 
     public void Dispose() => allState.Action -= StateHasChanged;
