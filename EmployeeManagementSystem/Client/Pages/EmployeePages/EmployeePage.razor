@@ -123,10 +123,12 @@ HandleSaveEmployeeClickedEvent="HandleSaveEmployeeClickedEvent" />
 
     protected async override Task OnInitializedAsync()
     {
-        allState.Action += StateHasChanged;
+        
         await LoadEmployees();
         await LoadDefaults();
         await GetTypesCount();
+        ShowMainPage = true;
+        allState.Action += StateHasChanged;
     }
 
     private async Task GetTypesCount()
@@ -146,7 +148,7 @@ HandleSaveEmployeeClickedEvent="HandleSaveEmployeeClickedEvent" />
         ShowAddOrUpdatePage = false;
         await LoadDefaults();
         await LoadEmployees();
-
+        allState.EmployeeClicked();
     }
     private async Task LoadEmployees()
     {
@@ -394,6 +396,7 @@ HandleSaveEmployeeClickedEvent="HandleSaveEmployeeClickedEvent" />
     void HandleDetailsPageClosedClicked()
     {
         allState.ShowDetailsPage = false;
+        allState.EmployeeClicked();
         ShowMainPage = true;
     }
 
